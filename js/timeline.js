@@ -380,7 +380,7 @@ class TimeLine {
 				set_data[index].death = data.participants[i].stats.deaths;
 				set_data[index].gold = data.participants[i].stats.goldEarned;
 				set_data[index].cs = data.participants[i].stats.totalMinionsKilled;
-
+				
 				set_data[index].items = [];
 				set_data[index].items[0] = data.participants[i].stats.item0;
 				set_data[index].items[1] = data.participants[i].stats.item1;
