@@ -1,0 +1,14 @@
+.blue {
+	float:left;
+}
+
+.red {
+	float:right;
+}
+
+section #champion_img img {
+	width:32px;
+	height:32px;
+    margin:3px;
+	vertical-align:top
+}

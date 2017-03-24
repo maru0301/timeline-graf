@@ -19,8 +19,13 @@ class TimeLine {
 		this.VERSION = "";
 		this.CDN_URL = "";
 
-		this.JSON_DATA_CHAMP_IMG = new Array();
+		this.JSON_DATA_MATCHDETAIL = {};
 		this.JSON_DATA_TIMELINE = {};
+
+		this.JSON_DATA_CHAMP_IMG = new Array();
+		this.JSON_DATA_SPELL_IMG = new Array();
+		this.JSON_DATA_ITEM_IMG = new Array();
+		this.JSON_DATA_MASTERY_IMG = new Array();
 
 		this.CANVAS_CHAMPION_IMG = new Array();
 		this.CANVAS_MAP_IMG = "";
@@ -108,6 +113,7 @@ class TimeLine {
 			var matchDetailData = { game:{}, teams:[] };
 			matchDetailData.game = self.GetMatchData(matchDetailJson);
 			matchDetailData.teams = self.GetTeamData(matchDetailJson);
+			self.JSON_DATA_MATCHDETAIL = matchDetailData;
 
 			console.log("------- json -------");
 			console.log(json);
@@ -196,13 +202,12 @@ class TimeLine {
 			for(var key in champImgJson.data)
 				self.JSON_DATA_CHAMP_IMG.push(champImgJson.data[key]);
 			
-			championImgData.sort(function(a, b)
-				{
+			self.JSON_DATA_CHAMP_IMG.sort(function(a, b)
+			{
 					if(a.key < b.key) return -1;
 					if(a.key > b.key) return 1;
 					if(a.key == b.key) return 0;
-				}
-			);
+			});
 			
 			for(var key in itemImgJson.data)
 				itemImgImgData[key] = itemImgJson.data[key];
@@ -249,6 +254,7 @@ class TimeLine {
 			console.log(masteryImgData);
 
 			// self.InitTimeLineCanvas(matchDetailData);
+			self.InitPlayer();
 			self.Show();
 		});
 
@@ -311,6 +317,59 @@ class TimeLine {
 		}, false);
 	}
 	*/
+
+	InitPlayer()
+	{
+		var newTag, target;		
+		var tag = new Array();
+
+		//target = document.getElementById("player");
+
+		for(var i = 1 ; i <= 5 ; ++i)
+		{
+/*
+			tag.push("<player"+i+">");
+			tag.push("<champion_img>");
+			tag.push("</champion_img>");
+			tag.push("<br>");
+			tag.push("<cs>");
+			tag.push("</cs>");
+			tag.push("</player"+i+">");
+			tag.push("<br>");
+*/
+			target = document.getElementById("player");
+			newTag = document.createElement("player"+i);
+//			newTag.id = "player"+i;
+			target.appendChild(newTag);
+			
+			var player_target = newTag;
+			newTag = document.createElement("div");
+			newTag.id = "champion_img";
+			player_target.appendChild(newTag);
+			player_target.innerHTML = player_target.innerHTML + "<br>";
+			newTag = document.createElement("div");
+			newTag.id = "cs";
+			newTag.className = "blue";
+			
+			player_target.appendChild(newTag);
+//			player_target.innerHTML = player_target.innerHTML + "<br>";
+
+			/*
+			newTag = document.createElement("player"+i);
+			target.appendChild(newTag);
+//			target.innerHTML=target.innerHTML + "<br>";
+
+			var player_target = newTag;
+			newTag = document.createElement("champion_img");
+			player_target.appendChild(newTag);
+			newTag = document.createElement("cs");
+			player_target.appendChild(newTag);
+			*/
+		}
+
+//		target.innerHTML=tag.join("");
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////
 	
 	GetTeamData(data)
@@ -508,6 +567,51 @@ class TimeLine {
 	Show()
 	{
 		console.log("Show");
+		console.log($("#player > player1 > champion_img"));
+
+		for( var i = 1 ; i <= 5 ; ++i )
+		{
+			this.ShowChampionImg(i);
+			this.ShowCS(i);
+		}
+	}
+
+	ShowChampionImg(player_index)
+	{
+		var blue_champ_index;
+		for(var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i)
+		{
+			if(this.JSON_DATA_CHAMP_IMG[i].id == this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].championId)
+			{
+				blue_champ_index = i;
+				break;
+			}
+		}
+
+		var red_champ_index;
+		for(var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i)
+		{
+			if(this.JSON_DATA_CHAMP_IMG[i].id == this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].championId)
+			{
+				red_champ_index = i;
+				break;
+			}
+		}
+
+		var blue_champ_img = this.JSON_DATA_CHAMP_IMG[blue_champ_index].image.full;
+		var blue_champ_name = this.JSON_DATA_CHAMP_IMG[blue_champ_index].name;
+		var red_champ_img = this.JSON_DATA_CHAMP_IMG[red_champ_index].image.full;
+		var red_champ_name = this.JSON_DATA_CHAMP_IMG[red_champ_index].name;
+
+		var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + blue_champ_img + "' title='" + blue_champ_name +"' class='blue'>";
+		tag = tag + "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + red_champ_img + "'  title='" + red_champ_name +"' class='red'>";
+		
+		$("#player > player"+ player_index +" > #champion_img").html(tag);
+	}
+	
+	ShowCS(player_index)
+	{
+		$("#player > player"+ player_index +" > #cs").html("<div class='blue'>CS : </div>");
 	}
 }
 
