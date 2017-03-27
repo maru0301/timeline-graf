@@ -29,6 +29,8 @@ class TimeLine {
 
 		this.CANVAS_CHAMPION_IMG = new Array();
 		this.CANVAS_MAP_IMG = "";
+
+		this.TEAM_TAG = [ "blue", "red" ];
 	}
 
 	GetMatchData(data)
@@ -322,52 +324,30 @@ class TimeLine {
 	{
 		var newTag, target;		
 		var tag = new Array();
-
-		//target = document.getElementById("player");
-
-		for(var i = 1 ; i <= 5 ; ++i)
+		
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 		{
-/*
-			tag.push("<player"+i+">");
-			tag.push("<champion_img>");
-			tag.push("</champion_img>");
-			tag.push("<br>");
-			tag.push("<cs>");
-			tag.push("</cs>");
-			tag.push("</player"+i+">");
-			tag.push("<br>");
-*/
 			target = document.getElementById("player");
-			newTag = document.createElement("player"+i);
-//			newTag.id = "player"+i;
+			newTag = document.createElement(this.TEAM_TAG[i]);
+			newTag.className = this.TEAM_TAG[i];
 			target.appendChild(newTag);
-			
-			var player_target = newTag;
-			newTag = document.createElement("div");
-			newTag.id = "champion_img";
-			player_target.appendChild(newTag);
-			player_target.innerHTML = player_target.innerHTML + "<br>";
-			newTag = document.createElement("div");
-			newTag.id = "cs";
-			newTag.className = "blue";
-			
-			player_target.appendChild(newTag);
-//			player_target.innerHTML = player_target.innerHTML + "<br>";
+			target = newTag;
 
-			/*
-			newTag = document.createElement("player"+i);
-			target.appendChild(newTag);
-//			target.innerHTML=target.innerHTML + "<br>";
-
-			var player_target = newTag;
-			newTag = document.createElement("champion_img");
-			player_target.appendChild(newTag);
-			newTag = document.createElement("cs");
-			player_target.appendChild(newTag);
-			*/
+			for( var j = 1 ; j <= 5 ; ++j )
+			{
+				newTag = document.createElement("player"+j);
+				target.appendChild(newTag);
+				
+				var player_target = newTag;
+				newTag = document.createElement("champion_img");
+				player_target.appendChild(newTag);
+				player_target.innerHTML = player_target.innerHTML + "<br>";
+				newTag = document.createElement("CS");
+				
+				player_target.appendChild(newTag);
+				player_target.innerHTML = player_target.innerHTML + "<br>";
+			}
 		}
-
-//		target.innerHTML=tag.join("");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -578,40 +558,79 @@ class TimeLine {
 
 	ShowChampionImg(player_index)
 	{
-		var blue_champ_index;
-		for(var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i)
+		var champ_index;
+		var champ_img;
+		var champ_name;
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 		{
-			if(this.JSON_DATA_CHAMP_IMG[i].id == this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].championId)
+			for( var j = 0 ; j < this.JSON_DATA_CHAMP_IMG.length ; ++j )
 			{
-				blue_champ_index = i;
-				break;
+				if(this.JSON_DATA_CHAMP_IMG[j].id == this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].championId)
+				{
+					champ_index = j;
+					break;
+				}
 			}
+
+			champ_img = this.JSON_DATA_CHAMP_IMG[champ_index].image.full;
+			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
+
+			//var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"'>";
+			var tag = "";
+			$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > champion_img").html(tag);
 		}
-
-		var red_champ_index;
-		for(var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i)
-		{
-			if(this.JSON_DATA_CHAMP_IMG[i].id == this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].championId)
-			{
-				red_champ_index = i;
-				break;
-			}
-		}
-
-		var blue_champ_img = this.JSON_DATA_CHAMP_IMG[blue_champ_index].image.full;
-		var blue_champ_name = this.JSON_DATA_CHAMP_IMG[blue_champ_index].name;
-		var red_champ_img = this.JSON_DATA_CHAMP_IMG[red_champ_index].image.full;
-		var red_champ_name = this.JSON_DATA_CHAMP_IMG[red_champ_index].name;
-
-		var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + blue_champ_img + "' title='" + blue_champ_name +"' class='blue'>";
-		tag = tag + "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + red_champ_img + "'  title='" + red_champ_name +"' class='red'>";
-		
-		$("#player > player"+ player_index +" > #champion_img").html(tag);
 	}
 	
 	ShowCS(player_index)
 	{
-		$("#player > player"+ player_index +" > #cs").html("<div class='blue'>CS : </div>");
+		var cs;
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		{
+			cs = this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].cs;
+			if( i == 0 )
+			{
+				$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS").html("CS : " + cs + "<br><canvas></canvas>");
+			}
+			else
+			{
+				$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS").html("CS : " + cs + "<br>");
+			}
+		}
+/*
+		var target = $("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS > canvas")[0];
+		target.width = 200;
+		target.height = 20;
+		var ctx = target.getContext('2d');
+		ctx.beginPath();
+		ctx.fillStyle = 'rgb(256, 0, 0)'; // 赤
+		ctx.fillRect(0, 0, target.width, target.height);
+		ctx.beginPath();
+		ctx.fillStyle = 'rgb(0, 0, 256)'; // 青
+		ctx.fillRect(0, 0, 80, target.height);
+*/
+		var cs_blue = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].cs;
+		var cs_red = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].cs;
+		var per = cs_blue / ( cs_blue + cs_red );
+		this.ShowBar($("#player > " + this.TEAM_TAG[0] + " > player"+ player_index +" > CS > canvas")[0], per)
+	}
+
+	ShowBar(target, x)
+	{
+		target.width = 200;
+		target.height = 20;
+
+		var ctx = target.getContext('2d');
+		ctx.beginPath();
+		ctx.fillStyle = 'rgb(255, 0, 0)'; // red
+		ctx.fillRect(0, 0, target.width, target.height);
+		ctx.beginPath();
+		ctx.fillStyle = 'rgb(0, 0, 255)'; // blue
+		ctx.fillRect(0, 0, target.width * x, target.height);
+		ctx.beginPath();
+		ctx.font = "18px";// 'ＭＳ Ｐゴシック'";
+		ctx.fillStyle = 'rgb(255, 255, 255)'; // blue
+		ctx.fillText("50%", 0, 12);
 	}
 }
 

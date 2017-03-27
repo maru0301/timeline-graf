@@ -6,7 +6,7 @@
 	float:right;
 }
 
-section #champion_img img {
+section champion_img img {
 	width:32px;
 	height:32px;
     margin:3px;
