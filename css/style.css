@@ -1,14 +1,19 @@
 .blue {
 	float:left;
+	clear:left;
 }
-
 .red {
 	float:right;
+	clear:right;
 }
 
-section champion_img img {
+img {
+/*
 	width:32px;
 	height:32px;
     margin:3px;
+*/
+	width:32px;
+	height:32px;
 	vertical-align:top
 }

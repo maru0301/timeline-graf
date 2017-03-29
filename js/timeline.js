@@ -21,7 +21,6 @@ class TimeLine {
 
 		this.JSON_DATA_MATCHDETAIL = {};
 		this.JSON_DATA_TIMELINE = {};
-
 		this.JSON_DATA_CHAMP_IMG = new Array();
 		this.JSON_DATA_SPELL_IMG = new Array();
 		this.JSON_DATA_ITEM_IMG = new Array();
@@ -31,6 +30,8 @@ class TimeLine {
 		this.CANVAS_MAP_IMG = "";
 
 		this.TEAM_TAG = [ "blue", "red" ];
+
+		this.TIMELINE_WORK_DATA = {};
 	}
 
 	GetMatchData(data)
@@ -120,14 +121,35 @@ class TimeLine {
 			console.log("------- json -------");
 			console.log(json);
 			console.log("------- matchDetailData -------");
-			console.log(matchDetailData);
+			console.log(matchDetailJson);
 			console.log("------- matchTimelineJson -------");
 			console.log(self.JSON_DATA_TIMELINE);
-			console.log("------- versionJson -------");
-			console.log(versionJson);
+//			console.log("------- versionJson -------");
+//			console.log(versionJson);
+			
+			for( var i in self.JSON_DATA_TIMELINE.frames )
+			{
+				self.JSON_DATA_TIMELINE.frames[i].events = self.JSON_DATA_TIMELINE.frames[i].events.filter(function(a){
+					switch (a.type)
+					{
+						case "ITEM_PURCHASED" :
+						case "ITEM_DESTROYED" :
+						case "ITEM_SOLD" :
+						case "ITEM_UNDO" :
+						case "SKILL_LEVEL_UP" :
+						case "WARD_PLACED" :
+						case "WARD_KILL" :
+							return false;
+						default :
+							return true;
+					}
+				});
+			}
+
 
 			self.VERSION = self.GetVersion(matchDetailData.game.gameVer, versionJson);
 			self.InitDataJson(matchDetailData, self.JSON_DATA_TIMELINE);
+			self.SetTimiLineFrameData();
 		});
 
 		$.when.apply(null, jqXHRList).fail(function ()
@@ -246,6 +268,7 @@ class TimeLine {
 			self.CDN_URL = realmJson.cdn;
 
 			// ReworkJson();
+			/*
 			console.log("------- championImgData -------");
 			console.log(self.JSON_DATA_CHAMP_IMG);
 			console.log("------- spellImgData -------");
@@ -254,9 +277,10 @@ class TimeLine {
 			console.log(itemImgImgData);
 			console.log("------- masteryImgData -------");
 			console.log(masteryImgData);
-
+			*/
 			// self.InitTimeLineCanvas(matchDetailData);
 			self.InitPlayer();
+			self.InitTimeLineSlideBar();
 			self.Show();
 		});
 
@@ -274,80 +298,58 @@ class TimeLine {
 			}
 		});
 	}
-	/*
-	InitTimeLineCanvas(matchDetailData)
-	{
-		this.ShowMapCanvas();
-
-		var team = [ "blue", "red" ];
-
-//		for( var i = 0, index = 1 ; i < team.length ; ++i )
-		for( var i = 0, index = 1 ; i < 1 ; ++i )
-		{
-//			for( var j = 0 ; j < matchDetailData.teams[i].player.length ; ++j, ++index )
-			for( var j = 0 ; j < 1 ; ++j, ++index )
-				this.InitChampionCanvas(team[i] + j + "_champion_canvas", index, this.GetChampionImgName(matchDetailData.teams[i].player[j].championId));
-		}
-	}
-
-	InitChampionCanvas(id_name, z_index, champ_name)
-	{
-		var target = document.getElementById("canvas");
-		var newTag;
-
-		newTag = document.createElement("canvas");
-		newTag.id =  id_name;
-		newTag.style = "position: absolute; z-index:" + z_index;
-
-
-		target.appendChild(newTag);
-
-		var ctx = newTag.getContext('2d');
-
-		this.CANVAS_CHAMPION_IMG.push(new Image());
-		var index = this.CANVAS_CHAMPION_IMG.length - 1;
-		this.CANVAS_CHAMPION_IMG[index].src = this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_name;
-
-		var self = this;
-
-		this.CANVAS_CHAMPION_IMG[index].addEventListener('load', function()
-		{
-			var quality = 0.3;
-			newTag.width = self.CANVAS_MAP_IMG.width;
-			newTag.height = self.CANVAS_MAP_IMG.height;
-//			ctx.drawImage(this, 0, 0, this.width, this.height, 0, 0 , this.width * quality, this.height * quality);
-		}, false);
-	}
-	*/
 
 	InitPlayer()
 	{
 		var newTag, target;		
 		var tag = new Array();
+		var player_target;
+		var new_tag_name = [
+			{	name:"champion_img",	isCanvas:false	},
+			{	name:"Name", 			isCanvas:false	},
+			{	name:"Lv",				isCanvas:true	},
+			{	name:"Xp",				isCanvas:true	},
+			{	name:"CS",				isCanvas:true	},
+			{	name:"Kill",			isCanvas:true	},
+/*			{	name:"Death",			isCanvas:true	},
+			{	name:"Assist",			isCanvas:true	},
+*/
+		];
 		
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( var i = 1 ; i <= 5 ; ++i )
 		{
 			target = document.getElementById("player");
-			newTag = document.createElement(this.TEAM_TAG[i]);
-			newTag.className = this.TEAM_TAG[i];
+			newTag = document.createElement("player"+i);
 			target.appendChild(newTag);
-			target = newTag;
-
-			for( var j = 1 ; j <= 5 ; ++j )
+			player_target = newTag;
+			for( var j = 0 ; j < new_tag_name.length ; ++j )
 			{
-				newTag = document.createElement("player"+j);
-				target.appendChild(newTag);
-				
-				var player_target = newTag;
-				newTag = document.createElement("champion_img");
+				newTag = document.createElement(new_tag_name[j].name);
 				player_target.appendChild(newTag);
-				player_target.innerHTML = player_target.innerHTML + "<br>";
-				newTag = document.createElement("CS");
-				
-				player_target.appendChild(newTag);
-				player_target.innerHTML = player_target.innerHTML + "<br>";
+				target = newTag;
+				for( var k = 0 ; k < this.TEAM_TAG.length ; ++k )
+				{
+					newTag = document.createElement(this.TEAM_TAG[k]);
+					newTag.className = this.TEAM_TAG[k];
+					target.appendChild(newTag);
+				}
+				if(new_tag_name[j].isCanvas)
+				{
+					newTag = document.createElement("canvas");
+					target.appendChild(newTag);
+				}
+//				player_target.innerHTML = player_target.innerHTML + "<br>";
 			}
 		}
+	}
+
+	InitTimeLineSlideBar()
+	{
+		var target = document.getElementById("slidebar");
+		var max = this.JSON_DATA_TIMELINE.frames.length;
+		var self = this;
+		target.innerHTML = "<input type='range' id='frame_slidebar' min='0' max='"+ max +"' step='1' value='" + max + "'><span id ='frame'></span>";
+		$("#frame_slidebar").change(self, self.ChangeFrame);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -414,6 +416,8 @@ class TimeLine {
 				set_data[index].spell[0] = data.participants[i].spell1Id;
 				set_data[index].spell[1] = data.participants[i].spell2Id;
 
+				set_data[index].lv = data.participants[i].stats.champLevel;
+
 				set_data[index].kill = data.participants[i].stats.kills;
 				set_data[index].assiste = data.participants[i].stats.assists;
 				set_data[index].death = data.participants[i].stats.deaths;
@@ -443,13 +447,32 @@ class TimeLine {
 				set_data[index].mastery = [];
 				for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
 					set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
-
+				
 				index++;
 				continue;
 			}
 		}
 
 		return set_data;
+	}
+
+	SetTimiLineFrameData()
+	{
+		this.TIMELINE_WORK_DATA.frame = [];
+
+		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		{
+			this.TIMELINE_WORK_DATA.frame[i] = {};
+			this.TIMELINE_WORK_DATA.frame[i].player = new Array();
+			this.TIMELINE_WORK_DATA.frame[i].events = [];
+
+			this.TIMELINE_WORK_DATA.frame[i].events = this.JSON_DATA_TIMELINE.frames[i].events;
+
+			for( var j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
+			{
+				this.TIMELINE_WORK_DATA.frame[i].player.push( this.JSON_DATA_TIMELINE.frames[i].participantFrames[j] );
+			}
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -491,69 +514,74 @@ class TimeLine {
 		}
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////
-	/*
-	ShowMapCanvas()
+	GetCS(player_index, frame)
 	{
-		var target = document.getElementById("canvas");
-		var newTag;
+		var cs = [];
 
-		newTag = document.createElement("canvas");
-		newTag.id = "map_canvas";
-		newTag.style = "position: absolute; z-index: 0";
-		
-		target.appendChild(newTag);
-
-		var ctx = newTag.getContext('2d');
-
-		this.CANVAS_MAP_IMG = new Image();
-		this.CANVAS_MAP_IMG.src = "./img/minimap.png";
-
-		this.CANVAS_MAP_IMG.addEventListener('load', function()
+		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
 		{
-			newTag.width = this.width;
-			newTag.height = this.height;
-//			ctx.drawImage(this, 0, 0);
-		}, false);
+			cs[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].cs;
+			cs[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].cs;
+		}
+		else
+		{
+			cs[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].jungleMinionsKilled + this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].minionsKilled;
+			cs[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].jungleMinionsKilled + this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].minionsKilled;
+		}
+
+		return cs;
 	}
 
-	ShowChampionCanvas()
+	GetLv(player_index, frame)
 	{
-		var target = document.getElementById("blue0_champion_canvas");
-		var ctx = target.getContext('2d');
-		console.log(ctx);
-//		ctx.translate(100,0);
-		ctx.clearRect(0, 0, target.width, target.height);
-//		ctx.drawImage(this.CANVAS_CHAMPION_IMG[0], 0, 0, this.CANVAS_CHAMPION_IMG[0].width, this.CANVAS_CHAMPION_IMG[0].height, 100, 0, 12, 12);
-	}
-	*/
-	////////////////////////////////////////////////////////////////////////////////////
-	/*
-	UpdateFrame(frame)
-	{
-		console.log("UpdateFrame");
-		console.log(this.JSON_DATA_TIMELINE.frames.length)
-		this.UpdateChampionCanvas(frame , this.JSON_DATA_TIMELINE);
+		var lv = [];
+
+		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
+		{
+			lv[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].lv;
+			lv[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].lv;
+		}
+		else
+		{
+			lv[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].level;
+			lv[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].level;
+		}
+
+		return lv;
 	}
 
-	UpdateChampionCanvas(frame, matchTimelineJson)
+	GetXp(player_index, frame)
 	{
-		this.ShowChampionCanvas();
+		var xp = [];
+
+		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
+		{
+			xp[0] = -1;
+			xp[1] = -1;
+		}
+		else
+		{
+			xp[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].xp;
+			xp[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].xp;
+		}
+
+		return xp;
 	}
-	*/
-	
+
 	////////////////////////////////////////////////////////////////////////////////////
 
 	Show()
 	{
-		console.log("Show");
-		console.log($("#player > player1 > champion_img"));
+		var frame = this.TIMELINE_WORK_DATA.frame.length;
+		frame = this.TIMELINE_WORK_DATA.frame.length-1;
 
 		for( var i = 1 ; i <= 5 ; ++i )
 		{
 			this.ShowChampionImg(i);
-			this.ShowCS(i);
+			this.ShowName(i);
 		}
+
+		$('#frame_slidebar').trigger('change');
 	}
 
 	ShowChampionImg(player_index)
@@ -576,61 +604,154 @@ class TimeLine {
 			champ_img = this.JSON_DATA_CHAMP_IMG[champ_index].image.full;
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
-			//var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"'>";
-			var tag = "";
-			$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > champion_img").html(tag);
+			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
+			//tag = "";
+			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
 	
-	ShowCS(player_index)
+	ShowName(player_index)
 	{
-		var cs;
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-		{
-			cs = this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].cs;
-			if( i == 0 )
-			{
-				$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS").html("CS : " + cs + "<br><canvas></canvas>");
-			}
-			else
-			{
-				$("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS").html("CS : " + cs + "<br>");
-			}
-		}
-/*
-		var target = $("#player > " + this.TEAM_TAG[i] + " > player"+ player_index +" > CS > canvas")[0];
-		target.width = 200;
-		target.height = 20;
-		var ctx = target.getContext('2d');
-		ctx.beginPath();
-		ctx.fillStyle = 'rgb(256, 0, 0)'; // 赤
-		ctx.fillRect(0, 0, target.width, target.height);
-		ctx.beginPath();
-		ctx.fillStyle = 'rgb(0, 0, 256)'; // 青
-		ctx.fillRect(0, 0, 80, target.height);
-*/
-		var cs_blue = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].cs;
-		var cs_red = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].cs;
-		var per = cs_blue / ( cs_blue + cs_red );
-		this.ShowBar($("#player > " + this.TEAM_TAG[0] + " > player"+ player_index +" > CS > canvas")[0], per)
+			$("#player > player"+ player_index + " > Name > " + this.TEAM_TAG[i]).html(this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].name);
 	}
 
-	ShowBar(target, x)
+	ShowCS(player_index, frame)
 	{
-		target.width = 200;
-		target.height = 20;
+		var cs = this.GetCS(player_index, frame);
 
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > CS > " + this.TEAM_TAG[i]).html("CS : " + cs[i]);
+	}
+
+	ShowCSBar(player_index, frame)
+	{
+		var cs = this.GetCS(player_index , frame);
+
+		var cs_blue = cs[0];
+		var cs_red = cs[1];
+		var per = cs_blue / ( cs_blue + cs_red );
+		
+		this.ShowBar($("#player > player"+ player_index +" > CS > canvas")[0], per);
+	}
+
+	ShowLv(player_index, frame)
+	{
+		var lv = this.GetLv(player_index, frame);
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("Lv : " + lv[i]);
+	}
+
+	ShowLvBar(player_index, frame)
+	{
+		var lv = this.GetLv(player_index , frame);
+
+		var lv_blue = lv[0];
+		var lv_red = lv[1];
+		var per = lv_blue / ( lv_blue + lv_red );
+		
+		this.ShowBar($("#player > player"+ player_index +" > Lv > canvas")[0], per);
+	}
+
+	ShowXp(player_index, frame, isVisible)
+	{
+		var xp = this.GetXp(player_index, frame );
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "Xp : " + xp[i] : "");
+	}
+
+	ShowXpBar(player_index, frame, isVisible)
+	{
+		var xp = this.GetXp(player_index , frame);
+
+		var xp_blue = xp[0];
+		var xp_red = xp[1];
+		var per = xp_blue / ( xp_blue + xp_red );
+		
+		
+		this.ShowBar($("#player > player"+ player_index +" > Xp > canvas")[0], per, isVisible);
+	}
+
+	ShowBar(target, x, isVisible = true)
+	{
 		var ctx = target.getContext('2d');
-		ctx.beginPath();
-		ctx.fillStyle = 'rgb(255, 0, 0)'; // red
-		ctx.fillRect(0, 0, target.width, target.height);
-		ctx.beginPath();
-		ctx.fillStyle = 'rgb(0, 0, 255)'; // blue
-		ctx.fillRect(0, 0, target.width * x, target.height);
-		ctx.beginPath();
-		ctx.font = "18px";// 'ＭＳ Ｐゴシック'";
-		ctx.fillStyle = 'rgb(255, 255, 255)'; // blue
-		ctx.fillText("50%", 0, 12);
+		if( isVisible )
+		{
+			target.width = window.innerWidth;
+			target.height = 20;
+
+			ctx.save();
+			ctx.font = "16px Arial";
+	//		ctx.font = "italic bold 18px 'ＭＳ Ｐゴシック'";
+			ctx.textAlign = 'center';
+
+			ctx.beginPath();
+			ctx.fillStyle = 'rgb(0, 0, 255)'; // blue
+			var blue_width = target.width * x;
+			ctx.fillRect(0, 0, blue_width, target.height);
+
+			ctx.beginPath();
+			ctx.fillStyle = 'rgb(255, 0, 0)'; // red
+			var red_width = target.width - blue_width;
+			ctx.fillRect(blue_width, 0, red_width, target.height);
+
+			ctx.beginPath();
+			ctx.fillStyle = 'rgb(255, 255, 255)';
+			var blue_par = this.FloatFormat(x * 100, 1);
+			var text_b = blue_par + "%";
+			ctx.beginPath();
+			ctx.fillText(text_b, Math.floor(blue_width/2), 16);
+			var red_par = 100 - blue_par;
+			var text_r = red_par + "%";
+			ctx.fillText(text_r, Math.floor(blue_width + (red_width/2)), 16);
+
+			ctx.restore();
+		}
+		else
+		{
+			target.width = 1;
+			target.height = 1;
+
+			ctx.save();
+			ctx.restore();
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	FloatFormat( number, n )
+	{
+		var _pow = Math.pow( 10 , n ) ;
+
+		return Math.round( number * _pow ) / _pow;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	ChangeFrame(handle)
+	{
+		var self = handle.data;
+		var frame = $("#frame_slidebar").val();
+		var isEnd = false;
+
+		if( frame >= self.JSON_DATA_TIMELINE.frames.length )
+			isEnd = true;
+		
+		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame+":00";
+
+		for( var i = 1 ; i <= 5 ; ++i )
+		{
+			self.ShowLv(i, frame);
+			self.ShowLvBar(i, frame);
+			self.ShowXp(i, frame, !isEnd);
+			self.ShowXpBar(i, frame, !isEnd);
+			self.ShowCS(i, frame);
+			self.ShowCSBar(i, frame);
+			self.ShowKill(i, frame);
+			self.ShowKillBar(i, frame);
+		}
 	}
 }
 
