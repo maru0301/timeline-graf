@@ -149,7 +149,7 @@ class TimeLine {
 
 			self.VERSION = self.GetVersion(matchDetailData.game.gameVer, versionJson);
 			self.InitDataJson(matchDetailData, self.JSON_DATA_TIMELINE);
-			self.SetTimiLineFrameData();
+			self.SetTimiLineFrameData(matchDetailData);
 		});
 
 		$.when.apply(null, jqXHRList).fail(function ()
@@ -456,21 +456,86 @@ class TimeLine {
 		return set_data;
 	}
 
-	SetTimiLineFrameData()
+	SetTimiLineFrameData(detailData)
 	{
 		this.TIMELINE_WORK_DATA.frame = [];
 
 		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
 		{
 			this.TIMELINE_WORK_DATA.frame[i] = {};
-			this.TIMELINE_WORK_DATA.frame[i].player = new Array();
-			this.TIMELINE_WORK_DATA.frame[i].events = [];
+			this.TIMELINE_WORK_DATA.frame[i].player = {};
+			this.TIMELINE_WORK_DATA.frame[i].team = {};
+//			this.TIMELINE_WORK_DATA.frame[i].events = [];
 
-			this.TIMELINE_WORK_DATA.frame[i].events = this.JSON_DATA_TIMELINE.frames[i].events;
+//			this.TIMELINE_WORK_DATA.frame[i].events = this.JSON_DATA_TIMELINE.frames[i].events;
 
 			for( var j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
 			{
-				this.TIMELINE_WORK_DATA.frame[i].player.push( this.JSON_DATA_TIMELINE.frames[i].participantFrames[j] );
+				this.TIMELINE_WORK_DATA.frame[i].player[j] = {};
+				this.TIMELINE_WORK_DATA.frame[i].player[j].participantId = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].participantId;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].xp = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].xp;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].gold = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].totalGold;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].lv = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].level;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].jungleMinionKill = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].jungleMinionsKilled;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].minionKill = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].minionsKilled;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].cs = this.TIMELINE_WORK_DATA.frame[i].player[j].jungleMinionKill + this.TIMELINE_WORK_DATA.frame[i].player[j].minionKill;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].kill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].death = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].assiste = 0;
+			}
+		}
+
+		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length] = {};
+		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player = [];
+
+		for( var j = 0, index = 1 ; j < detailData.teams.length ; ++j )
+		{
+			for( var k = 0 ; k < detailData.teams[j].player.length ; ++k, ++index )
+				this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player[index] = detailData.teams[j].player[k];
+		}
+
+		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team = $.extend(true, {}, detailData.teams);
+		delete this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team["player"];
+		// this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team[1].player = undefined;
+
+		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		{
+			for( var j = 0 ; j < this.JSON_DATA_TIMELINE.frames[i].events.length ; ++j )
+			{
+	//			var index = 
+	//			this.TIMELINE_WORK_DATA.frame[i].player[index] =
+				var isEnd = i == (this.JSON_DATA_TIMELINE.frames.length-1);
+
+				switch(this.JSON_DATA_TIMELINE.frames[i].events[j].type)
+				{
+					case "CHAMPION_KILL":
+						if(isEnd)
+							break;
+						
+						var set_work_frame = this.TIMELINE_WORK_DATA.frame[i+1];
+						var now_work_frame = this.TIMELINE_WORK_DATA.frame[i];
+						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
+						var assisteId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
+
+						set_work_frame.player[killerId].kill = set_work_frame.player[killerId].kill + now_work_frame.player[killerId].kill + 1;
+						set_work_frame.player[deathId].death = set_work_frame.player[deathId].death + now_work_frame.player[deathId].death + 1;
+						for( var k = 0 ; k < assisteId.length ; ++k )
+							set_work_frame.player[assisteId[k]].assiste = set_work_frame.player[assisteId[k]].assiste + now_work_frame.player[assisteId[k]].assiste + 1;
+
+						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+						{
+							this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill = set_work_frame.player[killerId].kill;
+							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death = set_work_frame.player[deathId].death;
+
+							for( var l = 0 ; l < assisteId.length ; ++l )
+								set_work_frame.player[assisteId[l]].assiste = set_work_frame.player[assisteId[l]].assiste + now_work_frame.player[assisteId[l]].assiste + 1;
+						}
+						break;
+					default :
+						console.log(this.JSON_DATA_TIMELINE.frames[i].events[j].type);
+						break;
+				}
 			}
 		}
 	}
@@ -566,6 +631,24 @@ class TimeLine {
 		}
 
 		return xp;
+	}
+
+	GetKill(player_index, frame)
+	{
+		var num = [];
+
+		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
+		{
+			num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].kill;
+			num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].kill;
+		}
+		else
+		{
+			num[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].kills;
+			num[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].kills;
+		}
+
+		return num;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -670,8 +753,33 @@ class TimeLine {
 		var xp_red = xp[1];
 		var per = xp_blue / ( xp_blue + xp_red );
 		
-		
 		this.ShowBar($("#player > player"+ player_index +" > Xp > canvas")[0], per, isVisible);
+	}
+
+	ShowKill(player_index, frame, isVisible)
+	{
+		var num = this.GetKill(player_index, frame );
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html(isVisible ? "Kill : " + num[i] : "");
+	}
+
+	ShowKillBar(player_index, frame, isVisible)
+	{
+		var num = this.GetKill(player_index , frame);
+
+		var num_blue = num[0];
+		var num_red = num[1];
+
+		if(num[0] == 0 && num[1] == 0)
+		{
+			num_blue = 1;
+			num_red = 1;
+		}
+
+		var per = num_blue / ( num_blue + num_red );
+		
+		this.ShowBar($("#player > player"+ player_index +" > Kill > canvas")[0], per, isVisible);
 	}
 
 	ShowBar(target, x, isVisible = true)
@@ -749,8 +857,8 @@ class TimeLine {
 			self.ShowXpBar(i, frame, !isEnd);
 			self.ShowCS(i, frame);
 			self.ShowCSBar(i, frame);
-			self.ShowKill(i, frame);
-			self.ShowKillBar(i, frame);
+			self.ShowKill(i, frame, isEnd);
+			self.ShowKillBar(i, frame, isEnd);
 		}
 	}
 }
