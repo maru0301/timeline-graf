@@ -60,14 +60,26 @@ class TimeLine {
 		var gameRealm = url.substr(0, index);
 
 		url = url.substr(index+1);
-		index = url.search('[\?]');
+		var isGameHash = url.search('gameHash') != -1;
+
+		if( isGameHash )
+			index = url.search('[\?]');
+		else
+			index = url.search("/");
 
 		var gameId = url.substr(0, index);
 
 		url = url.substr(index+1);
-		index = url.search('=');
-		url = url.substr(index+1);
-		index = url.search('&');
+		if( isGameHash )
+		{
+			index = url.search('=');
+			url = url.substr(index+1);
+			index = url.search('&');
+		}
+		else
+		{
+			index = url.search('[\?]');
+		}
 
 		if( index != -1 )
 			url = url.substr(0, index);
@@ -116,6 +128,40 @@ class TimeLine {
 			var matchDetailData = { game:{}, teams:[] };
 			matchDetailData.game = self.GetMatchData(matchDetailJson);
 			matchDetailData.teams = self.GetTeamData(matchDetailJson);
+			/*
+			var lane = ["TOP","JUNGLE","MIDDLE","BOTTOM", "BOTTOM"];
+			var sub = ["DUO_CARRY", "DUO_SUPPORT"];
+			var work = [];
+
+			for( var i = 0 ; i < matchDetailData.teams.length ; ++i )
+			{
+				work[i] = [];
+				for( var j = 0, sub_index = 0 ; j < lane.length ; ++j )
+				{
+					for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
+					{
+						if( lane[j] == matchDetailData.teams[i].player[k].lane )
+						{
+							if( lane[j] != "BOTTOM" )
+							{
+								work[i][j] = matchDetailData.teams[i].player[k];
+								break;
+							}
+							else if(sub[sub_index] == matchDetailData.teams[i].player[k].sub_lane)
+							{
+								work[i][j] = matchDetailData.teams[i].player[k];
+								sub_index++;
+								break;
+							}
+						}
+					}
+				}
+			}
+			for( var i = 0 ; i < work.length ; ++i )
+			{
+				matchDetailData.teams[i].player = work[i];
+			}
+			*/
 			self.JSON_DATA_MATCHDETAIL = matchDetailData;
 
 			console.log("------- json -------");
@@ -145,7 +191,6 @@ class TimeLine {
 					}
 				});
 			}
-
 
 			self.VERSION = self.GetVersion(matchDetailData.game.gameVer, versionJson);
 			self.InitDataJson(matchDetailData, self.JSON_DATA_TIMELINE);
@@ -310,10 +355,11 @@ class TimeLine {
 			{	name:"Lv",				isCanvas:true	},
 			{	name:"Xp",				isCanvas:true	},
 			{	name:"CS",				isCanvas:true	},
+			{	name:"MinionCS",		isCanvas:true	},
+			{	name:"JungleCS",		isCanvas:true	},
 			{	name:"Kill",			isCanvas:true	},
-/*			{	name:"Death",			isCanvas:true	},
-			{	name:"Assist",			isCanvas:true	},
-*/
+			{	name:"Death",			isCanvas:true	},
+			{	name:"Assiste",			isCanvas:true	},
 		];
 		
 		for( var i = 1 ; i <= 5 ; ++i )
@@ -338,8 +384,9 @@ class TimeLine {
 					newTag = document.createElement("canvas");
 					target.appendChild(newTag);
 				}
-//				player_target.innerHTML = player_target.innerHTML + "<br>";
 			}
+			target = document.getElementById("player");
+			target.innerHTML = target.innerHTML + "<hr>";
 		}
 	}
 
@@ -434,6 +481,7 @@ class TimeLine {
 				set_data[index].trinket = data.participants[i].stats.item6;
 
 				set_data[index].lane = data.participants[i].timeline.lane;
+				set_data[index].sub_lane = data.participants[i].timeline.role;
 
 				for( var j = 0 ; j < data.participantIdentities.length ; ++j )
 				{
@@ -491,7 +539,11 @@ class TimeLine {
 		for( var j = 0, index = 1 ; j < detailData.teams.length ; ++j )
 		{
 			for( var k = 0 ; k < detailData.teams[j].player.length ; ++k, ++index )
-				this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player[index] = detailData.teams[j].player[k];
+			{
+				var set_index = detailData.teams[j].player[k].participantId;
+				set_index = index;
+				this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player[set_index] = detailData.teams[j].player[k];
+			}
 		}
 
 		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team = $.extend(true, {}, detailData.teams);
@@ -517,19 +569,22 @@ class TimeLine {
 						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
 						var assisteId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
-
-						set_work_frame.player[killerId].kill = set_work_frame.player[killerId].kill + now_work_frame.player[killerId].kill + 1;
+						if(killerId != 0)
+							set_work_frame.player[killerId].kill = set_work_frame.player[killerId].kill + now_work_frame.player[killerId].kill + 1;
 						set_work_frame.player[deathId].death = set_work_frame.player[deathId].death + now_work_frame.player[deathId].death + 1;
 						for( var k = 0 ; k < assisteId.length ; ++k )
+						{
 							set_work_frame.player[assisteId[k]].assiste = set_work_frame.player[assisteId[k]].assiste + now_work_frame.player[assisteId[k]].assiste + 1;
-
+							console.log("frame : " + i + " id : " + assisteId[k] + " A : " + set_work_frame.player[assisteId[k]].assiste);
+						}
 						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 						{
-							this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill = set_work_frame.player[killerId].kill;
+							if(killerId != 0)
+								this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill = set_work_frame.player[killerId].kill;
 							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death = set_work_frame.player[deathId].death;
 
 							for( var l = 0 ; l < assisteId.length ; ++l )
-								set_work_frame.player[assisteId[l]].assiste = set_work_frame.player[assisteId[l]].assiste + now_work_frame.player[assisteId[l]].assiste + 1;
+								this.TIMELINE_WORK_DATA.frame[k].player[assisteId[l]].assiste = set_work_frame.player[assisteId[l]].assiste;
 						}
 						break;
 					default :
@@ -579,78 +634,6 @@ class TimeLine {
 		}
 	}
 
-	GetCS(player_index, frame)
-	{
-		var cs = [];
-
-		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
-		{
-			cs[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].cs;
-			cs[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].cs;
-		}
-		else
-		{
-			cs[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].jungleMinionsKilled + this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].minionsKilled;
-			cs[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].jungleMinionsKilled + this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].minionsKilled;
-		}
-
-		return cs;
-	}
-
-	GetLv(player_index, frame)
-	{
-		var lv = [];
-
-		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
-		{
-			lv[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].lv;
-			lv[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].lv;
-		}
-		else
-		{
-			lv[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].level;
-			lv[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].level;
-		}
-
-		return lv;
-	}
-
-	GetXp(player_index, frame)
-	{
-		var xp = [];
-
-		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
-		{
-			xp[0] = -1;
-			xp[1] = -1;
-		}
-		else
-		{
-			xp[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].xp;
-			xp[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].xp;
-		}
-
-		return xp;
-	}
-
-	GetKill(player_index, frame)
-	{
-		var num = [];
-
-		if( this.TIMELINE_WORK_DATA.frame.length-1 < frame )
-		{
-			num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].player[player_index-1].kill;
-			num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].player[player_index-1].kill;
-		}
-		else
-		{
-			num[0] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index-1].kills;
-			num[1] = this.TIMELINE_WORK_DATA.frame[frame].player[player_index+4].kills;
-		}
-
-		return num;
-	}
-
 	////////////////////////////////////////////////////////////////////////////////////
 
 	Show()
@@ -688,7 +671,7 @@ class TimeLine {
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
 			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
-			//tag = "";
+			tag = "";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
@@ -701,103 +684,201 @@ class TimeLine {
 
 	ShowCS(player_index, frame)
 	{
-		var cs = this.GetCS(player_index, frame);
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].cs,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].cs
+		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > CS > " + this.TEAM_TAG[i]).html("CS : " + cs[i]);
+			$("#player > player"+ player_index + " > CS > " + this.TEAM_TAG[i]).html("CS : " + num[i]);
 	}
 
 	ShowCSBar(player_index, frame)
 	{
-		var cs = this.GetCS(player_index , frame);
-
-		var cs_blue = cs[0];
-		var cs_red = cs[1];
-		var per = cs_blue / ( cs_blue + cs_red );
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].cs,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].cs
+		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > CS > canvas")[0], per);
+		this.ShowBar($("#player > player"+ player_index +" > CS > canvas")[0], num);
 	}
 
 	ShowLv(player_index, frame)
 	{
-		var lv = this.GetLv(player_index, frame);
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].lv,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].lv
+		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("Lv : " + lv[i]);
+			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("Lv : " + num[i]);
 	}
 
 	ShowLvBar(player_index, frame)
 	{
-		var lv = this.GetLv(player_index , frame);
-
-		var lv_blue = lv[0];
-		var lv_red = lv[1];
-		var per = lv_blue / ( lv_blue + lv_red );
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].lv,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].lv
+		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > Lv > canvas")[0], per);
+		this.ShowBar($("#player > player"+ player_index +" > Lv > canvas")[0], num);
 	}
 
 	ShowXp(player_index, frame, isVisible)
 	{
-		var xp = this.GetXp(player_index, frame );
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].xp,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].xp
+		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "Xp : " + xp[i] : "");
+			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "Xp : " + num[i] : "");
 	}
 
 	ShowXpBar(player_index, frame, isVisible)
 	{
-		var xp = this.GetXp(player_index , frame);
-
-		var xp_blue = xp[0];
-		var xp_red = xp[1];
-		var per = xp_blue / ( xp_blue + xp_red );
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].xp,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].xp
+		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > Xp > canvas")[0], per, isVisible);
+		this.ShowBar($("#player > player"+ player_index +" > Xp > canvas")[0], num, isVisible);
 	}
 
-	ShowKill(player_index, frame, isVisible)
+	ShowKill(player_index, frame)
 	{
-		var num = this.GetKill(player_index, frame );
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].kill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].kill
+		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html(isVisible ? "Kill : " + num[i] : "");
+			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
 	}
 
-	ShowKillBar(player_index, frame, isVisible)
+	ShowKillBar(player_index, frame)
 	{
-		var num = this.GetKill(player_index , frame);
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].kill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].kill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > Kill > canvas")[0], num);
+	}
 
-		var num_blue = num[0];
-		var num_red = num[1];
+	ShowDeath(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].death,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].death
+		];
 
-		if(num[0] == 0 && num[1] == 0)
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
+	}
+
+	ShowDeathBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].death,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].death
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > Death > canvas")[0], num);
+	}
+
+	ShowAssiste(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assiste,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assiste
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Assiste > " + this.TEAM_TAG[i]).html("Assiste : " + num[i]);
+	}
+
+	ShowAssisteBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assiste,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assiste
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > Assiste > canvas")[0], num);
+	}
+
+	ShowMinionCS(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].minionKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].minionKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > MinionCS > " + this.TEAM_TAG[i]).html(isVisible ? "MinionCS : " + num[i] : "");
+	}
+
+	ShowMinionCSBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].minionKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].minionKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > MinionCS > canvas")[0], num, isVisible);
+	}
+
+	ShowJungleMinionCS(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].jungleMinionKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].jungleMinionKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > JungleCS > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS : " + num[i] : "");
+	}
+
+	ShowJungleMinionCSBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].jungleMinionKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].jungleMinionKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > JungleCS > canvas")[0], num, isVisible);
+	}
+
+	ShowBar(target, num_array, isVisible = true)
+	{
+		var num_blue = num_array[0];
+		var num_red = num_array[1];
+		
+		if(num_blue == 0 && num_red == 0)
 		{
 			num_blue = 1;
 			num_red = 1;
 		}
 
 		var per = num_blue / ( num_blue + num_red );
-		
-		this.ShowBar($("#player > player"+ player_index +" > Kill > canvas")[0], per, isVisible);
-	}
 
-	ShowBar(target, x, isVisible = true)
-	{
 		var ctx = target.getContext('2d');
+
 		if( isVisible )
 		{
-			target.width = window.innerWidth;
+			target.width = window.innerWidth-30;
 			target.height = 20;
 
 			ctx.save();
+
 			ctx.font = "16px Arial";
 	//		ctx.font = "italic bold 18px 'ＭＳ Ｐゴシック'";
 			ctx.textAlign = 'center';
 
 			ctx.beginPath();
 			ctx.fillStyle = 'rgb(0, 0, 255)'; // blue
-			var blue_width = target.width * x;
+			var blue_width = target.width * per;
 			ctx.fillRect(0, 0, blue_width, target.height);
 
 			ctx.beginPath();
@@ -807,13 +888,13 @@ class TimeLine {
 
 			ctx.beginPath();
 			ctx.fillStyle = 'rgb(255, 255, 255)';
-			var blue_par = this.FloatFormat(x * 100, 1);
+			var blue_par = this.FloatFormat(per * 100, 1);
 			var text_b = blue_par + "%";
 			ctx.beginPath();
-			ctx.fillText(text_b, Math.floor(blue_width/2), 16);
-			var red_par = 100 - blue_par;
+			ctx.fillText(text_b, Math.floor(blue_width/2), 16, blue_width);
+			var red_par = this.FloatFormat(100 - blue_par, 1);
 			var text_r = red_par + "%";
-			ctx.fillText(text_r, Math.floor(blue_width + (red_width/2)), 16);
+			ctx.fillText(text_r, Math.floor(blue_width + (red_width/2)), 16, red_width);
 
 			ctx.restore();
 		}
@@ -857,8 +938,16 @@ class TimeLine {
 			self.ShowXpBar(i, frame, !isEnd);
 			self.ShowCS(i, frame);
 			self.ShowCSBar(i, frame);
-			self.ShowKill(i, frame, isEnd);
-			self.ShowKillBar(i, frame, isEnd);
+			self.ShowMinionCS(i, frame, !isEnd);
+			self.ShowMinionCSBar(i, frame, !isEnd);
+			self.ShowJungleMinionCS(i, frame, !isEnd);
+			self.ShowJungleMinionCSBar(i, frame, !isEnd);
+			self.ShowKill(i, frame);
+			self.ShowKillBar(i, frame);
+			self.ShowDeath(i, frame);
+			self.ShowDeathBar(i, frame);
+			self.ShowAssiste(i, frame);
+			self.ShowAssisteBar(i, frame);
 		}
 	}
 }
