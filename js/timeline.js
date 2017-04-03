@@ -354,12 +354,33 @@ class TimeLine {
 			{	name:"Name", 			isCanvas:false	},
 			{	name:"Lv",				isCanvas:true	},
 			{	name:"Xp",				isCanvas:true	},
+			{	name:"Gold",			isCanvas:true	},
 			{	name:"CS",				isCanvas:true	},
 			{	name:"MinionCS",		isCanvas:true	},
 			{	name:"JungleCS",		isCanvas:true	},
-			{	name:"Kill",			isCanvas:true	},
+			{	name:"JungleCS",		isCanvas:true	},
+			{	name:"TowerKill",		isCanvas:true	},
+			{	name:"WardsPlace",		isCanvas:true	},
+			{	name:"BuyVisionWard",	isCanvas:true	},
+			{	name:"WardsKill",		isCanvas:true	},
 			{	name:"Death",			isCanvas:true	},
 			{	name:"Assiste",			isCanvas:true	},
+			{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
+			{	name:"PhysicalDamageDealtToPlayer",			isCanvas:true	},
+			{	name:"MagicDamageDealtToChampion",			isCanvas:true	},
+			{	name:"MagicDamageDealtToPlayer",			isCanvas:true	},
+			{	name:"TrueDamageDealtToChampion",			isCanvas:true	},
+			{	name:"TrueDamageDealtToPlayer",				isCanvas:true	},
+			{	name:"TotalDamageDealt",					isCanvas:true	},
+			{	name:"TotalDamageDealtToBuilding",			isCanvas:true	},
+			{	name:"TotalDamageDealtToChampion",			isCanvas:true	},
+			{	name:"TotalCrawdControlDamageDealt",		isCanvas:true	},
+			{	name:"TotalDamageTaken",					isCanvas:true	},
+			{	name:"PhysicalDamageTaken",					isCanvas:true	},
+			{	name:"MagicDamageTaken",					isCanvas:true	},
+			{	name:"TrueDamageTaken",						isCanvas:true	},
+			{	name:"TotalHeal",							isCanvas:true	},
+			{	name:"TotalHealToUnit",						isCanvas:true	},
 		];
 		
 		for( var i = 1 ; i <= 5 ; ++i )
@@ -496,6 +517,33 @@ class TimeLine {
 				for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
 					set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
 				
+				set_data[index].turretsKill = data.participants[i].stats.turretsKilled || 0; // 破壊タレット数
+				set_data[index].buyVisionWard = data.participants[i].stats.visionWardsBoughtInGame || 0;
+				set_data[index].wardsKill = data.participants[i].stats.wardsKilled || 0;
+				set_data[index].wardsPlace = data.participants[i].stats.wardsPlaced || 0;
+
+				// 与えたダメージ
+				set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
+				set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
+				set_data[index].magicDamageDealtToChampions = data.participants[i].stats.magicDamageDealtToChampions || 0; // 与えたメージ量(魔法)
+				set_data[index].magicDamageDealtPlayer = data.participants[i].stats.magicDamageDealtPlayer || 0;
+				set_data[index].trueDamageDealtToChampions = data.participants[i].stats.trueDamageDealtToChampions || 0; // 与えたメージ量(確定ダメージ)
+				set_data[index].trueDamageDealtToPlayer = data.participants[i].stats.trueDamageDealtPlayer || 0;
+				set_data[index].totalTimeCrowdControlDealt = data.participants[i].stats.totalTimeCrowdControlDealt || 0;
+				// set_data[index].largestCriticalStrike = data.participants[i].stats.largestCriticalStrike || 0; // 最大クリティカルダメージ
+				
+				set_data[index].totalDamageDealt = data.participants[i].stats.totalDamageDealt || 0; // 与えたダメージ量(全ダメージ)
+				set_data[index].totalDamageDealtToBuildings = data.participants[i].stats.totalDamageDealtToBuildings || 0;
+				set_data[index].totalDamageDealtToChampions = data.participants[i].stats.totalDamageDealtToChampions || 0;
+				// 受けたダメージ
+				set_data[index].physicalDamageTaken = data.participants[i].stats.physicalDamageTaken || 0;
+				set_data[index].magicDamageTaken = data.participants[i].stats.magicDamageTaken || 0;
+				set_data[index].trueDamageTaken = data.participants[i].stats.trueDamageTaken || 0;
+				set_data[index].totalDamageTaken = data.participants[i].stats.totalDamageTaken || 0;
+				// 回復
+				set_data[index].totalHeal = data.participants[i].stats.totalHeal || 0; // 合計回復量
+				set_data[index].totalUnitsHealed = data.participants[i].stats.totalUnitsHealed || 0; // ユニット回復量
+
 				index++;
 				continue;
 			}
@@ -513,9 +561,6 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[i] = {};
 			this.TIMELINE_WORK_DATA.frame[i].player = {};
 			this.TIMELINE_WORK_DATA.frame[i].team = {};
-//			this.TIMELINE_WORK_DATA.frame[i].events = [];
-
-//			this.TIMELINE_WORK_DATA.frame[i].events = this.JSON_DATA_TIMELINE.frames[i].events;
 
 			for( var j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
 			{
@@ -548,14 +593,11 @@ class TimeLine {
 
 		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team = $.extend(true, {}, detailData.teams);
 		delete this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team["player"];
-		// this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team[1].player = undefined;
 
 		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
 		{
 			for( var j = 0 ; j < this.JSON_DATA_TIMELINE.frames[i].events.length ; ++j )
 			{
-	//			var index = 
-	//			this.TIMELINE_WORK_DATA.frame[i].player[index] =
 				var isEnd = i == (this.JSON_DATA_TIMELINE.frames.length-1);
 
 				switch(this.JSON_DATA_TIMELINE.frames[i].events[j].type)
@@ -569,22 +611,24 @@ class TimeLine {
 						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
 						var assisteId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
+						
 						if(killerId != 0)
-							set_work_frame.player[killerId].kill = set_work_frame.player[killerId].kill + now_work_frame.player[killerId].kill + 1;
-						set_work_frame.player[deathId].death = set_work_frame.player[deathId].death + now_work_frame.player[deathId].death + 1;
+							set_work_frame.player[killerId].kill++;
+						
+						set_work_frame.player[deathId].death++;
+
 						for( var k = 0 ; k < assisteId.length ; ++k )
-						{
-							set_work_frame.player[assisteId[k]].assiste = set_work_frame.player[assisteId[k]].assiste + now_work_frame.player[assisteId[k]].assiste + 1;
-							console.log("frame : " + i + " id : " + assisteId[k] + " A : " + set_work_frame.player[assisteId[k]].assiste);
-						}
+							set_work_frame.player[assisteId[k]].assiste++;
+
 						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 						{
 							if(killerId != 0)
-								this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill = set_work_frame.player[killerId].kill;
-							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death = set_work_frame.player[deathId].death;
-
+								this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill++;
+							
+							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death++;
+							
 							for( var l = 0 ; l < assisteId.length ; ++l )
-								this.TIMELINE_WORK_DATA.frame[k].player[assisteId[l]].assiste = set_work_frame.player[assisteId[l]].assiste;
+								this.TIMELINE_WORK_DATA.frame[k].player[assisteId[l]].assiste++;
 						}
 						break;
 					default :
@@ -671,7 +715,7 @@ class TimeLine {
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
 			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
-			tag = "";
+			//tag = "";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
@@ -850,6 +894,447 @@ class TimeLine {
 		this.ShowBar($("#player > player"+ player_index +" > JungleCS > canvas")[0], num, isVisible);
 	}
 
+	ShowGold(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].gold,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].gold
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
+	}
+
+	ShowGoldBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].gold,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].gold
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > Gold > canvas")[0], num);
+	}
+
+	ShowPhysicalDamageDealtToChampion(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtToChampions
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > PhysicalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Champion : " + num[i] : "");
+	}
+
+	ShowPhysicalDamageDealtToChampionBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtToChampions
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > PhysicalDamageDealtToChampion > canvas")[0], num, isVisible);
+	}
+
+	ShowPhysicalDamageDealtToPlayer(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtPlayer
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > PhysicalDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Player : " + num[i] : "");
+	}
+
+	ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtPlayer
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > PhysicalDamageDealtToPlayer > canvas")[0], num, isVisible);
+	}
+
+	ShowMagicDamageDealtToChampion(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtToChampions
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > MagicDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Champion : " + num[i] : "");
+	}
+
+	ShowMagicDamageDealtToChampionBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtToChampions
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > MagicDamageDealtToChampion > canvas")[0], num, isVisible);
+	}
+
+	ShowMagicDamageDealtToPlayer(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtPlayer
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > MagicDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Player : " + num[i] : "");
+	}
+
+	ShowMagicDamageDealtToPlayerBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtPlayer
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > MagicDamageDealtToPlayer > canvas")[0], num, isVisible);
+	}
+
+	ShowTrueDamageDealtToChampion(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToChampions
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TrueDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Champion : " + num[i] : "");
+	}
+
+	ShowTrueDamageDealtToChampionBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToChampions
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TrueDamageDealtToChampion > canvas")[0], num, isVisible);
+	}
+
+	ShowTrueDamageDealtToPlayer(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToPlayer
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TrueDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Player : " + num[i] : "");
+	}
+
+	ShowTrueDamageDealtToPlayerBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToPlayer,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToPlayer
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > trueDamageDealtToPlayer > canvas")[0], num, isVisible);
+	}
+
+	ShowTotalDamageDealt(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealt,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealt
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamageDealt : " + num[i] : "");
+	}
+
+	ShowTotalDamageDealtBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealt,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealt
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalDamageDealt > canvas")[0], num, isVisible);
+	}
+
+	ShowTotalDamageDealtToBuilding(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToBuildings,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToBuildings
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalDamageDealtToBuilding > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Building : " + num[i] : "");
+	}
+
+	ShowTotalDamageDealtToBuildingBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToBuildings,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToBuildings
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalDamageDealtToBuilding > canvas")[0], num, isVisible);
+	}
+
+	ShowTotalDamageDealtToChampion(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToChampions
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Champion : " + num[i] : "");
+	}
+
+	ShowTotalDamageDealtToChampionBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToChampions,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToChampions
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalDamageDealtToChampion > canvas")[0], num, isVisible);
+	}
+
+	ShowTotalCrawdControlDamageDealt(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalTimeCrowdControlDealt,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalTimeCrowdControlDealt
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalCrawdControlDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "Total TimeCrowd Control <br>Dealt : " + num[i] : "");
+	}
+
+	ShowTotalCrawdControlDamageDealtBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalTimeCrowdControlDealt,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalTimeCrowdControlDealt
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalCrawdControlDamageDealt > canvas")[0], num, isVisible);
+	}
+	
+	ShowTotalDamageTaken(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageTaken
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Taken : " + num[i] : "");
+	}
+
+	ShowTotalDamageTakenBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageTaken
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalDamageTaken > canvas")[0], num, isVisible);
+	}
+
+	ShowPhysicalDamageTaken(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageTaken
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > PhysicalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Taken : " + num[i] : "");
+	}
+
+	ShowPhysicalDamageTakenBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageTaken
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > PhysicalDamageTaken > canvas")[0], num, isVisible);
+	}
+	
+	ShowMagicDamageTaken(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageTaken
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > MagicDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Taken : " + num[i] : "");
+	}
+
+	ShowMagicDamageTakenBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageTaken
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > MagicDamageTaken > canvas")[0], num, isVisible);
+	}
+	
+	ShowTrueDamageTaken(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageTaken
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TrueDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Champion : " + num[i] : "");
+	}
+
+	ShowTrueDamageTakenBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageTaken,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageTaken
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TrueDamageTaken > canvas")[0], num, isVisible);
+	}
+	
+	ShowTotalHeal(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalHeal,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalHeal
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalHeal > " + this.TEAM_TAG[i]).html(isVisible ? "Total Heal <br>to Champion : " + num[i] : "");
+	}
+
+	ShowTotalHealBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalHeal,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalHeal
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalHeal > canvas")[0], num, isVisible);
+	}
+	
+	ShowTotalHealToUnit(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalUnitsHealed,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalUnitsHealed
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TotalHealToUnit > " + this.TEAM_TAG[i]).html(isVisible ? "Total Unit Heal : " + num[i] : "");
+	}
+
+	ShowTotalHealToUnitBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalUnitsHealed,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalUnitsHealed
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TotalHealToUnit > canvas")[0], num, isVisible);
+	}
+
+	ShowTowerKill(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].turretsKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html(isVisible ? "Tower Kill : " + num[i] : "");
+	}
+
+	ShowTowerKillBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].turretsKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > TowerKill > canvas")[0], num, isVisible);
+	}
+
+	ShowBuyVisionWard(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].buyVisionWard
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html(isVisible ? "Buy VisionWard : " + num[i] : "");
+	}
+
+	ShowBuyVisionWardBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].buyVisionWard
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > BuyVisionWard > canvas")[0], num, isVisible);
+	}
+
+	ShowWardsPlace(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsPlace
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > WardsPlace > " + this.TEAM_TAG[i]).html(isVisible ? "Wards Place : " + num[i] : "");
+	}
+
+	ShowWardsPlaceBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsPlace
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > WardsPlace > canvas")[0], num, isVisible);
+	}
+
+	ShowWardsKill(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > WardsKill > " + this.TEAM_TAG[i]).html(isVisible ? "Wards Kill : " + num[i] : "");
+	}
+
+	ShowWardsKillBar(player_index, frame, isVisible)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > WardsKill > canvas")[0], num, isVisible);
+	}
+
 	ShowBar(target, num_array, isVisible = true)
 	{
 		var num_blue = num_array[0];
@@ -873,7 +1358,7 @@ class TimeLine {
 			ctx.save();
 
 			ctx.font = "16px Arial";
-	//		ctx.font = "italic bold 18px 'ＭＳ Ｐゴシック'";
+			// ctx.font = "italic bold 18px 'ＭＳ Ｐゴシック'";
 			ctx.textAlign = 'center';
 
 			ctx.beginPath();
@@ -902,7 +1387,7 @@ class TimeLine {
 		{
 			target.width = 1;
 			target.height = 1;
-
+			
 			ctx.save();
 			ctx.restore();
 		}
@@ -928,7 +1413,7 @@ class TimeLine {
 		if( frame >= self.JSON_DATA_TIMELINE.frames.length )
 			isEnd = true;
 		
-		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame+":00";
+		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
 
 		for( var i = 1 ; i <= 5 ; ++i )
 		{
@@ -936,6 +1421,8 @@ class TimeLine {
 			self.ShowLvBar(i, frame);
 			self.ShowXp(i, frame, !isEnd);
 			self.ShowXpBar(i, frame, !isEnd);
+			self.ShowGold(i, frame);
+			self.ShowGoldBar(i, frame);
 			self.ShowCS(i, frame);
 			self.ShowCSBar(i, frame);
 			self.ShowMinionCS(i, frame, !isEnd);
@@ -948,6 +1435,48 @@ class TimeLine {
 			self.ShowDeathBar(i, frame);
 			self.ShowAssiste(i, frame);
 			self.ShowAssisteBar(i, frame);
+
+			self.ShowPhysicalDamageDealtToChampion(i, frame, isEnd);
+			self.ShowPhysicalDamageDealtToChampionBar(i, frame, isEnd);
+			self.ShowPhysicalDamageDealtToPlayer(i, frame, isEnd);
+			self.ShowPhysicalDamageDealtToPlayerBar(i, frame, isEnd);
+			self.ShowMagicDamageDealtToChampion(i, frame, isEnd);
+			self.ShowMagicDamageDealtToChampionBar(i, frame, isEnd);
+			self.ShowMagicDamageDealtToPlayer(i, frame, isEnd);
+			self.ShowMagicDamageDealtToPlayerBar(i, frame, isEnd);
+			self.ShowTrueDamageDealtToChampion(i, frame, isEnd);
+			self.ShowTrueDamageDealtToChampionBar(i, frame, isEnd);
+			self.ShowTrueDamageDealtToPlayer(i, frame, isEnd);
+			self.ShowTrueDamageDealtToPlayerBar(i, frame, isEnd);
+			self.ShowTotalDamageDealt(i, frame, isEnd);
+			self.ShowTotalDamageDealtBar(i, frame, isEnd);
+			self.ShowTotalDamageDealtToBuilding(i, frame, isEnd);
+			self.ShowTotalDamageDealtToBuildingBar(i, frame, isEnd);
+			self.ShowTotalDamageDealtToChampion(i, frame, isEnd);
+			self.ShowTotalDamageDealtToChampionBar(i, frame, isEnd);
+			self.ShowTotalCrawdControlDamageDealt(i, frame, isEnd);
+			self.ShowTotalCrawdControlDamageDealtBar(i, frame, isEnd);
+			self.ShowPhysicalDamageTaken(i, frame, isEnd);
+			self.ShowPhysicalDamageTakenBar(i, frame, isEnd);
+			self.ShowMagicDamageTaken(i, frame, isEnd);
+			self.ShowMagicDamageTakenBar(i, frame, isEnd);
+			self.ShowTrueDamageTaken(i, frame, isEnd);
+			self.ShowTrueDamageTakenBar(i, frame, isEnd);
+			self.ShowTotalDamageTaken(i, frame, isEnd);
+			self.ShowTotalDamageTakenBar(i, frame, isEnd);
+			self.ShowTotalHeal(i, frame, isEnd);
+			self.ShowTotalHealBar(i, frame, isEnd);
+			self.ShowTotalHealToUnit(i, frame, isEnd);
+			self.ShowTotalHealToUnitBar(i, frame, isEnd);
+			
+			self.ShowTowerKill(i, frame, isEnd);
+			self.ShowTowerKillBar(i, frame, isEnd);
+			self.ShowBuyVisionWard(i, frame, isEnd);
+			self.ShowBuyVisionWardBar(i, frame, isEnd);
+			self.ShowWardsPlace(i, frame, isEnd);
+			self.ShowWardsPlaceBar(i, frame, isEnd);
+			self.ShowWardsKill(i, frame, isEnd);
+			self.ShowWardsKillBar(i, frame, isEnd);
 		}
 	}
 }
