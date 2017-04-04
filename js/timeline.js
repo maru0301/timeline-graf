@@ -12,7 +12,7 @@ class TimeLine {
 		this.ERROR_ID_SUMMONER_SPELL_GET_ERROR 	= "チーム情報が取得出来ませんでした";
 		this.ERROR_ID_ITEM_IMG_GET_ERROR 		= "アイテムイメージ情報が取得出来ませんでした";
 		this.ERROR_ID_TEAM_GET_ERROR 			= "チーム情報が取得出来ませんでした";
-		this.ERROR_ID_MASTERY_IMG_GET_ERROR 		= "マスタリーイメージ情報が取得出来ませんでした";
+		this.ERROR_ID_MASTERY_IMG_GET_ERROR 	= "マスタリーイメージ情報が取得出来ませんでした";
 		this.ERROR_ID_MATCH_DETAILS_GET_ERROR	= "試合情報が取得出来ませんでした";
 		this.ERROR_ID_MATCH_TIMELINE_GET_ERROR	= "タイムライン情報が取得出来ませんでした";
 
@@ -22,16 +22,17 @@ class TimeLine {
 		this.JSON_DATA_MATCHDETAIL = {};
 		this.JSON_DATA_TIMELINE = {};
 		this.JSON_DATA_CHAMP_IMG = new Array();
-		this.JSON_DATA_SPELL_IMG = new Array();
+		//this.JSON_DATA_SPELL_IMG = new Array();
 		this.JSON_DATA_ITEM_IMG = new Array();
-		this.JSON_DATA_MASTERY_IMG = new Array();
+		//this.JSON_DATA_MASTERY_IMG = new Array();
 
-		this.CANVAS_CHAMPION_IMG = new Array();
-		this.CANVAS_MAP_IMG = "";
+		//this.CANVAS_CHAMPION_IMG = new Array();
+		//this.CANVAS_MAP_IMG = "";
 
 		this.TEAM_TAG = [ "blue", "red" ];
 
 		this.TIMELINE_WORK_DATA = {};
+		this.VISION_WARD_ID = new Array();
 	}
 
 	GetMatchData(data)
@@ -87,8 +88,10 @@ class TimeLine {
 		var gameHash = url;
 
 		var request = [
-			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
-			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
+			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
+			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/ljl.json', data: {},  },
+			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
+			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/ljl_timeline.json', data: {},  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
 		];
 
@@ -178,13 +181,9 @@ class TimeLine {
 				self.JSON_DATA_TIMELINE.frames[i].events = self.JSON_DATA_TIMELINE.frames[i].events.filter(function(a){
 					switch (a.type)
 					{
-						case "ITEM_PURCHASED" :
 						case "ITEM_DESTROYED" :
-						case "ITEM_SOLD" :
-						case "ITEM_UNDO" :
 						case "SKILL_LEVEL_UP" :
-						case "WARD_PLACED" :
-						case "WARD_KILL" :
+						case "WARD_PLACED " :
 							return false;
 						default :
 							return true;
@@ -219,9 +218,9 @@ class TimeLine {
 		var request = [
 			{ error_id: this.ERROR_ID_REALM_GET_ERROR,			url: './php/main.php', data: { func:"GetRealm" },  },
 			{ error_id: this.ERROR_ID_CHAMPION_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetChampionImage", ver:this.VERSION },  },
-			{ error_id: this.ERROR_ID_SUMMONER_SPELL_GET_ERROR,	url: './php/main.php', data: { func:"GetSummonerSpells", ver:this.VERSION },  },
 			{ error_id: this.ERROR_ID_ITEM_IMG_GET_ERROR,		url: './php/main.php', data: { func:"GetItem", ver:this.VERSION },  },
-			{ error_id: this.ERROR_ID_MASTERY_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetMasteryImage", ver:this.VERSION },  },
+//			{ error_id: this.ERROR_ID_SUMMONER_SPELL_GET_ERROR,	url: './php/main.php', data: { func:"GetSummonerSpells", ver:this.VERSION },  },
+//			{ error_id: this.ERROR_ID_MASTERY_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetMasteryImage", ver:this.VERSION },  },
 		];
 
 		var jqXHRList = [];
@@ -258,14 +257,14 @@ class TimeLine {
 
 			var realmJson = json[0];
 			var champImgJson = json[1];
-			var spellJson = json[2];
-			var itemImgJson = json[3];
-			var masteryImgJson = json[4];
+			var itemImgJson = json[2];
+//			var spellJson = json[2];
+//			var masteryImgJson = json[4];
 
 			var championImgData = new Array();
-			var spellImgData = new Array();
 			var itemImgImgData = new Array();
-			var masteryImgData = new Array();
+//			var spellImgData = new Array();
+//			var masteryImgData = new Array();
 
 			// ソート
 			for(var key in champImgJson.data)
@@ -281,6 +280,26 @@ class TimeLine {
 			for(var key in itemImgJson.data)
 				itemImgImgData[key] = itemImgJson.data[key];
 			
+			var isSet = false;
+			for(var key in itemImgImgData )
+			{
+				if( !itemImgImgData[key].name )
+					continue;
+				
+				if(itemImgImgData[key].name.indexOf("ward") != -1 || itemImgImgData[key].name.indexOf("Ward") != -1 )
+				{
+					isSet = false;
+					if( itemImgImgData[key].name.indexOf("vision") != -1 || itemImgImgData[key].name.indexOf("Vision") != -1 )
+						isSet = true;
+					if( itemImgImgData[key].name.indexOf("control") != -1 || itemImgImgData[key].name.indexOf("Control") != -1 )
+						isSet = true;
+
+					if(isSet)
+						self.VISION_WARD_ID.push(itemImgImgData[key].id);
+				}
+
+			}
+			/*
 			for(var key in spellJson.data)
 			{
 				var id = spellJson.data[key].id;
@@ -294,7 +313,6 @@ class TimeLine {
 					if(a.name == b.name) return 0;
 				}
 			);
-			
 			for(var key in masteryImgJson.data)
 			{
 				masteryImgData[key] = masteryImgJson.data[key];
@@ -309,10 +327,10 @@ class TimeLine {
 					if(a.name == b.name) return 0;
 				}
 			);
+			*/
 
 			self.CDN_URL = realmJson.cdn;
 
-			// ReworkJson();
 			/*
 			console.log("------- championImgData -------");
 			console.log(self.JSON_DATA_CHAMP_IMG);
@@ -358,11 +376,15 @@ class TimeLine {
 			{	name:"CS",				isCanvas:true	},
 			{	name:"MinionCS",		isCanvas:true	},
 			{	name:"JungleCS",		isCanvas:true	},
-			{	name:"JungleCS",		isCanvas:true	},
+			{	name:"DragonKill",		isCanvas:true	},
+			{	name:"RiftHeraldKill",	isCanvas:true	},
+			{	name:"BaronKill",		isCanvas:true	},
 			{	name:"TowerKill",		isCanvas:true	},
-			{	name:"WardsPlace",		isCanvas:true	},
+			{	name:"InhibitorKill",	isCanvas:true	},
+			{	name:"WardPlace",		isCanvas:true	},
+			{	name:"WardKill",		isCanvas:true	},
 			{	name:"BuyVisionWard",	isCanvas:true	},
-			{	name:"WardsKill",		isCanvas:true	},
+			{	name:"Kill",			isCanvas:true	},
 			{	name:"Death",			isCanvas:true	},
 			{	name:"Assiste",			isCanvas:true	},
 			{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
@@ -517,11 +539,15 @@ class TimeLine {
 				for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
 					set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
 				
-				set_data[index].turretsKill = data.participants[i].stats.turretsKilled || 0; // 破壊タレット数
+				set_data[index].turretsKill = data.participants[i].stats.turretKills || 0; // 破壊タレット数
 				set_data[index].buyVisionWard = data.participants[i].stats.visionWardsBoughtInGame || 0;
-				set_data[index].wardsKill = data.participants[i].stats.wardsKilled || 0;
-				set_data[index].wardsPlace = data.participants[i].stats.wardsPlaced || 0;
+				set_data[index].wardKill = data.participants[i].stats.wardsKilled || 0;
+				set_data[index].wardPlace = data.participants[i].stats.wardsPlaced || 0;
 
+				set_data[index].dragonKill = 0;
+				set_data[index].riftheraldKill = 0;
+				set_data[index].baronKill = 0;
+				set_data[index].inhibitorKill = 0;
 				// 与えたダメージ
 				set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
 				set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
@@ -560,7 +586,24 @@ class TimeLine {
 		{
 			this.TIMELINE_WORK_DATA.frame[i] = {};
 			this.TIMELINE_WORK_DATA.frame[i].player = {};
-			this.TIMELINE_WORK_DATA.frame[i].team = {};
+			this.TIMELINE_WORK_DATA.frame[i].team = [ {}, {} ];
+
+			for( var j = 0 ; j < this.TIMELINE_WORK_DATA.frame[i].team.length ; ++j )
+			{
+				this.TIMELINE_WORK_DATA.frame[i].team[j].gold = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].cs = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].kill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].death = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].assiste = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].dragonKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].riftheraldKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].baronKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].turretsKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].buyVisionWard = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].wardKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].wardPlace = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].inhibitorKill = 0;
+			}
 
 			for( var j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
 			{
@@ -575,6 +618,14 @@ class TimeLine {
 				this.TIMELINE_WORK_DATA.frame[i].player[j].kill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].death = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].assiste = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].dragonKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].riftheraldKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].baronKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].turretsKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].buyVisionWard = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].wardKill = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].wardPlace = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].inhibitorKill = 0;
 			}
 		}
 
@@ -599,6 +650,7 @@ class TimeLine {
 			for( var j = 0 ; j < this.JSON_DATA_TIMELINE.frames[i].events.length ; ++j )
 			{
 				var isEnd = i == (this.JSON_DATA_TIMELINE.frames.length-1);
+				var set_work_frame = this.TIMELINE_WORK_DATA.frame[i+1];
 
 				switch(this.JSON_DATA_TIMELINE.frames[i].events[j].type)
 				{
@@ -606,8 +658,6 @@ class TimeLine {
 						if(isEnd)
 							break;
 						
-						var set_work_frame = this.TIMELINE_WORK_DATA.frame[i+1];
-						var now_work_frame = this.TIMELINE_WORK_DATA.frame[i];
 						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
 						var assisteId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
@@ -631,9 +681,165 @@ class TimeLine {
 								this.TIMELINE_WORK_DATA.frame[k].player[assisteId[l]].assiste++;
 						}
 						break;
-					default :
-						console.log(this.JSON_DATA_TIMELINE.frames[i].events[j].type);
+					case "ELITE_MONSTER_KILL" :
+						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+
+						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].monsterType)
+						{
+							case "DRAGON" :
+								if(killerId != 0)
+									set_work_frame.player[killerId].dragonKill++;
+								
+								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								{
+									if(killerId != 0)
+										this.TIMELINE_WORK_DATA.frame[k].player[killerId].dragonKill++;
+								}
+								break;
+							case "RIFTHERALD" :
+								if(killerId != 0)
+									set_work_frame.player[killerId].riftherakdKill++;
+								
+								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								{
+									if(killerId != 0)
+										this.TIMELINE_WORK_DATA.frame[k].player[killerId].riftherakdKill++;
+								}
+								break;
+							case "BARON_NASHOR" :
+								if(killerId != 0)
+									set_work_frame.player[killerId].baronKill++;
+								
+								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								{
+									if(killerId != 0)
+										this.TIMELINE_WORK_DATA.frame[k].player[killerId].baronKill++;
+								}
+								break;
+							default :
+								console.log("Type : " + this.JSON_DATA_TIMELINE.frames[i].events[j].monsterType);
+								break;
+						}
 						break;
+					case "BUILDING_KILL":
+						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+
+						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].towerType)
+						{
+							case "NEXUS_TURRET" :
+							case "INNER_TURRET" :
+							case "BASE_TURRET" :
+							case "OUTER_TURRET" :
+								if(killerId != 0)
+									set_work_frame.player[killerId].turretsKill++;
+								
+								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								{
+									if(killerId != 0)
+										this.TIMELINE_WORK_DATA.frame[k].player[killerId].turretsKill++;
+								}
+								break;
+							case "UNDEFINED_TURRET" :
+								if(killerId != 0)
+									set_work_frame.player[killerId].inhibitorKill++;
+								
+								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								{
+									if(killerId != 0)
+										this.TIMELINE_WORK_DATA.frame[k].player[killerId].inhibitorKill++;
+								}
+								break;
+							default:
+								console.log(this.JSON_DATA_TIMELINE.frames[i].events[j].towerType);
+								break;
+						}
+						break;
+/*
+					case "WARD_PLACED":
+						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].creatorId;
+						if(setId ==1)
+						{
+//						console.log(i +" - " + j);
+//						console.log("wardPlace : " + set_work_frame.player[setId].wardPlace);
+//						console.log(this.JSON_DATA_TIMELINE.frames[i].events[j]);
+						}
+
+						set_work_frame.player[setId].wardPlace++;
+						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlace++;
+						break;
+					case "WARD_KILL":
+						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+
+						set_work_frame.player[killerId].wardKill++;
+						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							this.TIMELINE_WORK_DATA.frame[k].player[killerId].wardKill++;
+						break;
+					case "ITEM_PURCHASED":
+						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+
+						if( $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].itemId, this.VISION_WARD_ID ) >= 0 )
+						{
+							set_work_frame.player[setId].buyVisionWard++;
+							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard++;
+						}
+						break;
+*/
+					case "ITEM_SOLD":
+						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+
+						if( $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].itemId, this.VISION_WARD_ID ) >= 0 )
+						{
+							set_work_frame.player[setId].buyVisionWard--;
+							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard--;
+						}
+						break;
+					case "ITEM_UNDO":
+						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+						var isAddd = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].afterId, this.VISION_WARD_ID ) >= 0;
+						var isRem = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].beforeId, this.VISION_WARD_ID ) >= 0;
+
+						if( isAddd ^ isRem )
+						{
+							isAddd ? set_work_frame.player[setId].buyVisionWard++ : set_work_frame.player[setId].buyVisionWard--;
+
+							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								isAddd ? this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard++ : this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard--;
+						}
+						break;
+					default :
+//						console.log(this.JSON_DATA_TIMELINE.frames[i].events[j].type + " : " + i + " - " + j);
+						break;
+				}
+			}
+		}
+
+		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		{
+			for( var j in this.TIMELINE_WORK_DATA.frame[i].player[j] )
+			{
+				for( var k = 0 ; k < this.JSON_DATA_MATCHDETAIL.teams.length ; ++k )
+				{
+					for( var l = 0 ; l < this.JSON_DATA_MATCHDETAIL.teams[k].player.length ; ++l )
+					{
+						if( this.TIMELINE_WORK_DATA.frame[i].player[j].participantId == this.JSON_DATA_MATCHDETAIL.teams[k].player[l].participantId )
+						{
+							this.TIMELINE_WORK_DATA.frame[i].team[k].gold += this.TIMELINE_WORK_DATA.frame[i].player[j].gold;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].cs += this.TIMELINE_WORK_DATA.frame[i].player[j].cs;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].kill += this.TIMELINE_WORK_DATA.frame[i].player[j].kill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].death += this.TIMELINE_WORK_DATA.frame[i].player[j].death;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].assiste += this.TIMELINE_WORK_DATA.frame[i].player[j].assiste;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].dragonKill += this.TIMELINE_WORK_DATA.frame[i].player[j].dragonKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].riftheraldKill += this.TIMELINE_WORK_DATA.frame[i].player[j].riftheraldKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].baronKill += this.TIMELINE_WORK_DATA.frame[i].player[j].baronKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].turretsKill += this.TIMELINE_WORK_DATA.frame[i].player[j].turretsKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].wardKill += this.TIMELINE_WORK_DATA.frame[i].player[j].wardKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].wardPlace += this.TIMELINE_WORK_DATA.frame[i].player[j].wardPlace;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].inhibitorKill += this.TIMELINE_WORK_DATA.frame[i].player[j].inhibitorKill;
+						}
+					}
 				}
 			}
 		}
@@ -715,7 +921,7 @@ class TimeLine {
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
 			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
-			//tag = "";
+			tag = "";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
@@ -1251,7 +1457,7 @@ class TimeLine {
 		this.ShowBar($("#player > player"+ player_index +" > TotalHealToUnit > canvas")[0], num, isVisible);
 	}
 
-	ShowTowerKill(player_index, frame, isVisible)
+	ShowTowerKill(player_index, frame)
 	{
 		var num = [
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
@@ -1259,20 +1465,20 @@ class TimeLine {
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html(isVisible ? "Tower Kill : " + num[i] : "");
+			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html("Tower Kill : " + num[i]);
 	}
 
-	ShowTowerKillBar(player_index, frame, isVisible)
+	ShowTowerKillBar(player_index, frame)
 	{
 		var num = [
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].turretsKill
 		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > TowerKill > canvas")[0], num, isVisible);
+		this.ShowBar($("#player > player"+ player_index +" > TowerKill > canvas")[0], num);
 	}
 
-	ShowBuyVisionWard(player_index, frame, isVisible)
+	ShowBuyVisionWard(player_index, frame)
 	{
 		var num = [
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
@@ -1280,59 +1486,143 @@ class TimeLine {
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html(isVisible ? "Buy VisionWard : " + num[i] : "");
+			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
 	}
 
-	ShowBuyVisionWardBar(player_index, frame, isVisible)
+	ShowBuyVisionWardBar(player_index, frame)
 	{
 		var num = [
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
 					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].buyVisionWard
 		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > BuyVisionWard > canvas")[0], num, isVisible);
+		this.ShowBar($("#player > player"+ player_index +" > BuyVisionWard > canvas")[0], num);
 	}
 
-	ShowWardsPlace(player_index, frame, isVisible)
+	ShowWardPlace(player_index, frame, isVisible)
 	{
 		var num = [
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsPlace,
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsPlace
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlace
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardsPlace > " + this.TEAM_TAG[i]).html(isVisible ? "Wards Place : " + num[i] : "");
+			$("#player > player"+ player_index + " > WardPlace > " + this.TEAM_TAG[i]).html(isVisible ? "Ward Place : " + num[i] : "");
 	}
 
-	ShowWardsPlaceBar(player_index, frame, isVisible)
+	ShowWardPlaceBar(player_index, frame, isVisible)
 	{
 		var num = [
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsPlace,
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsPlace
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlace
 		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > WardsPlace > canvas")[0], num, isVisible);
+		this.ShowBar($("#player > player"+ player_index +" > WardPlace > canvas")[0], num, isVisible);
 	}
 
-	ShowWardsKill(player_index, frame, isVisible)
+	ShowWardKill(player_index, frame)
 	{
 		var num = [
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsKill,
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsKill
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKill
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardsKill > " + this.TEAM_TAG[i]).html(isVisible ? "Wards Kill : " + num[i] : "");
+			$("#player > player"+ player_index + " > WardKill > " + this.TEAM_TAG[i]).html("Ward Destroyed : " + num[i]);
 	}
 
-	ShowWardsKillBar(player_index, frame, isVisible)
+	ShowWardKillBar(player_index, frame)
 	{
 		var num = [
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardsKill,
-					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardsKill
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKill
 		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > WardsKill > canvas")[0], num, isVisible);
+		this.ShowBar($("#player > player"+ player_index +" > WardKill > canvas")[0], num);
+	}
+
+	ShowDragonKill(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].dragonKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].dragonKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > DragonKill > " + this.TEAM_TAG[i]).html("Dragon Kill : " + num[i]);
+	}
+
+	ShowDragonKillBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].dragonKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].dragonKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > DragonKill > canvas")[0], num);
+	}
+
+	ShowRiftheraldKill(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].riftheraldKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].riftheraldKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > RiftheraldKill > " + this.TEAM_TAG[i]).html("Riftherald Kill : " + num[i]);
+	}
+
+	ShowRiftheraldKillBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].riftheraldKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].riftheraldKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > RiftheraldKill > canvas")[0], num);
+	}
+
+	ShowBaronKill(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].baronKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].baronKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > BaronKill > " + this.TEAM_TAG[i]).html("Baron Kill : " + num[i]);
+	}
+
+	ShowBaronKillBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].baronKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].baronKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > BaronKill > canvas")[0], num);
+	}
+
+	ShowInhibitorKill(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].inhibitorKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].inhibitorKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > InhibitorKill > " + this.TEAM_TAG[i]).html("Inhibitor Kill : " + num[i]);
+	}
+
+	ShowInhibitorKillBar(player_index, frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index].inhibitorKill,
+					this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].inhibitorKill
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > InhibitorKill > canvas")[0], num);
 	}
 
 	ShowBar(target, num_array, isVisible = true)
@@ -1469,14 +1759,22 @@ class TimeLine {
 			self.ShowTotalHealToUnit(i, frame, isEnd);
 			self.ShowTotalHealToUnitBar(i, frame, isEnd);
 			
-			self.ShowTowerKill(i, frame, isEnd);
-			self.ShowTowerKillBar(i, frame, isEnd);
-			self.ShowBuyVisionWard(i, frame, isEnd);
-			self.ShowBuyVisionWardBar(i, frame, isEnd);
-			self.ShowWardsPlace(i, frame, isEnd);
-			self.ShowWardsPlaceBar(i, frame, isEnd);
-			self.ShowWardsKill(i, frame, isEnd);
-			self.ShowWardsKillBar(i, frame, isEnd);
+			self.ShowTowerKill(i, frame);
+			self.ShowTowerKillBar(i, frame);
+			self.ShowBuyVisionWard(i, frame);
+			self.ShowBuyVisionWardBar(i, frame);
+			self.ShowWardPlace(i, frame, isEnd);
+			self.ShowWardPlaceBar(i, frame, isEnd);
+			self.ShowWardKill(i, frame);
+			self.ShowWardKillBar(i, frame);
+			self.ShowDragonKill(i, frame);
+			self.ShowDragonKillBar(i, frame);
+			self.ShowRiftheraldKill(i, frame);
+			self.ShowRiftheraldKillBar(i, frame);
+			self.ShowBaronKill(i, frame);
+			self.ShowBaronKillBar(i, frame);
+			self.ShowInhibitorKill(i, frame);
+			self.ShowInhibitorKillBar(i, frame);
 		}
 	}
 }
