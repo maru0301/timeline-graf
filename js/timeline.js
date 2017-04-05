@@ -88,10 +88,10 @@ class TimeLine {
 		var gameHash = url;
 
 		var request = [
-			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
-			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/ljl.json', data: {},  },
-			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
-			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/ljl_timeline.json', data: {},  },
+			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
+			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/ljl.json', data: {},  },
+			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
+			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/ljl_timeline.json', data: {},  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
 		];
 
@@ -512,7 +512,7 @@ class TimeLine {
 				set_data[index].assiste = data.participants[i].stats.assists;
 				set_data[index].death = data.participants[i].stats.deaths;
 				set_data[index].gold = data.participants[i].stats.goldEarned;
-				set_data[index].cs = data.participants[i].stats.totalMinionsKilled;
+				set_data[index].cs = data.participants[i].stats.totalMinionsKilled + data.participants[i].stats.neturalMinionKilled;
 				
 				set_data[index].items = [];
 				set_data[index].items[0] = data.participants[i].stats.item0;

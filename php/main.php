@@ -6,20 +6,12 @@ if( !isset( $_GET['func'] ) ) return;
 
 class RiotApi
 {
-	private $api_key = '561cb811-20fb-4e50-bc7f-3f3c8cd345e4';
+	private $api_key = '';
 	
 	private function GetJson( $url )
 	{
-		$proxy = array(
-			"http" => array(
-					"proxy" => "proxy2.hq.scei.sony.co.jp:10080",
-					'request_fulluri' => true,
-				),
-		);
-		
-		$proxy_context = stream_context_create($proxy);
 		$master_url = $url . $this->api_key;
-		$json = file_get_contents($master_url, false, $proxy_context );
+		$json = file_get_contents($master_url);
 		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 		
 		return $json;
@@ -70,18 +62,9 @@ class RiotApi
 		$gameId = $_GET['id'];
 		$gameHash = $_GET['hash'];
 
-		$proxy = array(
-			"http" => array(
-					"proxy" => "proxy2.hq.scei.sony.co.jp:10080",
-					'request_fulluri' => true,
-				),
-		);
-		
-		$proxy_context = stream_context_create($proxy);
-
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "?gameHash=" . $gameHash;
 
-		$json = file_get_contents($url, false, $proxy_context);
+		$json = file_get_contents($url);
 		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 		
 		return $json;
@@ -93,18 +76,9 @@ class RiotApi
 		$gameId = $_GET['id'];
 		$gameHash = $_GET['hash'];
 
-		$proxy = array(
-			"http" => array(
-					"proxy" => "proxy2.hq.scei.sony.co.jp:10080",
-					'request_fulluri' => true,
-				),
-		);
-		
-		$proxy_context = stream_context_create($proxy);
-
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "/timeline?gameHash=" . $gameHash;
 
-		$json = file_get_contents($url, false, $proxy_context);
+		$json = file_get_contents($url);
 		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 		
 		return $json;
