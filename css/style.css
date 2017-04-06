@@ -7,6 +7,11 @@
 	clear:right;
 }
 
+hr {
+	clear:left;
+	clear:right;	
+}
+
 img {
 /*
 	width:32px;

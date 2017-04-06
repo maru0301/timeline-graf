@@ -33,6 +33,10 @@ class TimeLine {
 
 		this.TIMELINE_WORK_DATA = {};
 		this.VISION_WARD_ID = new Array();
+
+		this.frame = 0;
+		this.isShow = false;
+		this.isEndFrame = false;
 	}
 
 	GetMatchData(data)
@@ -88,10 +92,10 @@ class TimeLine {
 		var gameHash = url;
 
 		var request = [
-			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
-			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/ljl.json', data: {},  },
-			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
-			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/ljl_timeline.json', data: {},  },
+			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
+			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/ljl.json', data: {},  },
+			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
+			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/ljl_timeline.json', data: {},  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
 		];
 
@@ -205,7 +209,7 @@ class TimeLine {
 			{
 				if( jqXHRList[i].statusText === "error" )
 				{
-					errorDlg(request[i].error_id);
+					console.log(request[i].error_id);
 				}
 			}
 		});
@@ -342,6 +346,7 @@ class TimeLine {
 			console.log(masteryImgData);
 			*/
 			// self.InitTimeLineCanvas(matchDetailData);
+			self.InitTeam();
 			self.InitPlayer();
 			self.InitTimeLineSlideBar();
 			self.Show();
@@ -356,17 +361,61 @@ class TimeLine {
 			{
 				if( jqXHRList[i].statusText === "error" )
 				{
-					errorDlg(request[i].error_id);
+					console.log(request[i].error_id);
 				}
 			}
 		});
 	}
+	
+	InitTeam()
+	{
+		var newTag, target;
+
+		var new_tag_name = [
+			{	name:"WinLose", 		isCanvas:false	},
+			{	name:"Name", 			isCanvas:false	},
+			{	name:"Kill",			isCanvas:true	},
+			{	name:"Death",			isCanvas:true	},
+			{	name:"Assiste",			isCanvas:true	},
+			{	name:"Gold",			isCanvas:true	},
+			{	name:"CS",				isCanvas:true	},
+			{	name:"DragonKill",		isCanvas:true	},
+			{	name:"RiftHeraldKill",	isCanvas:true	},
+			{	name:"BaronKill",		isCanvas:true	},
+			{	name:"TowerKill",		isCanvas:true	},
+			{	name:"InhibitorKill",	isCanvas:true	},
+			{	name:"WardPlace",		isCanvas:true	},
+			{	name:"WardKill",		isCanvas:true	},
+			{	name:"BuyVisionWard",	isCanvas:true	},
+		];
+
+		for( var i = 0 ; i < new_tag_name.length ; ++i )
+		{
+			target = document.getElementById("team");
+			newTag = document.createElement(new_tag_name[i].name);
+			target.appendChild(newTag);
+			target = newTag;
+			
+			for( var j = 0 ; j < this.TEAM_TAG.length ; ++j )
+			{
+				newTag = document.createElement(this.TEAM_TAG[j]);
+				newTag.className = this.TEAM_TAG[j];
+				target.appendChild(newTag);
+			}
+
+			if(new_tag_name[i].isCanvas)
+			{
+				newTag = document.createElement("canvas");
+				target.appendChild(newTag);
+			}
+		}
+	}
 
 	InitPlayer()
 	{
-		var newTag, target;		
-		var tag = new Array();
+		var newTag, target;
 		var player_target;
+
 		var new_tag_name = [
 			{	name:"champion_img",	isCanvas:false	},
 			{	name:"Name", 			isCanvas:false	},
@@ -416,12 +465,14 @@ class TimeLine {
 				newTag = document.createElement(new_tag_name[j].name);
 				player_target.appendChild(newTag);
 				target = newTag;
+
 				for( var k = 0 ; k < this.TEAM_TAG.length ; ++k )
 				{
 					newTag = document.createElement(this.TEAM_TAG[k]);
 					newTag.className = this.TEAM_TAG[k];
 					target.appendChild(newTag);
 				}
+
 				if(new_tag_name[j].isCanvas)
 				{
 					newTag = document.createElement("canvas");
@@ -456,12 +507,34 @@ class TimeLine {
 			set_data[i].player = this.GetPlayerData(data, set_data[i].teamId);
 
 			set_data[i].kill = 0;
+			set_data[i].death = 0;
+			set_data[i].assiste = 0;
 			set_data[i].gold = 0;
+			set_data[i].cs = 0;
+			set_data[i].dragonKill = 0;
+			set_data[i].riftheraldKill = 0;
+			set_data[i].baronKill = 0;
+			set_data[i].turretsKill = 0;
+			set_data[i].inhibitorKill = 0;
+			set_data[i].wardPlace = 0;
+			set_data[i].wardKill = 0;
+			set_data[i].buyVisionWard = 0;
 			
 			for( var j = 0 ; j < set_data[i].player.length ; ++j )
 			{
 				set_data[i].kill += set_data[i].player[j].kill;
+				set_data[i].death += set_data[i].player[j].death;
+				set_data[i].assiste += set_data[i].player[j].assiste;
 				set_data[i].gold += set_data[i].player[j].gold;
+				set_data[i].cs += set_data[i].player[j].cs;
+				set_data[i].dragonKill += set_data[i].player[j].dragonKill;
+				set_data[i].riftheraldKill += set_data[i].player[j].riftheraldKill;
+				set_data[i].baronKill += set_data[i].player[j].baronKill;
+				set_data[i].turretsKill += set_data[i].player[j].turretsKill;
+				set_data[i].inhibitorKill += set_data[i].player[j].inhibitorKill;
+				set_data[i].wardPlace += set_data[i].player[j].wardPlace;
+				set_data[i].wardKill += set_data[i].player[j].wardKill;
+				set_data[i].buyVisionWard += set_data[i].player[j].buyVisionWard;
 			}
 
 			var tag = set_data[i].player[0].name;
@@ -478,11 +551,11 @@ class TimeLine {
 	{
 		var set_data = {};
 
-		set_data.tower = data.towerKills;
-		set_data.dragon = data.dragonKills;
+		set_data.turretsKill = data.towerKills;
+		set_data.dragonKill = data.dragonKills;
 		set_data.baron = data.baronKills;
-		set_data.rift_herald = data.riftHeraldKills;
-		set_data.inhibitor = data.inhibitorKills;
+		set_data.riftheraldKill = data.riftHeraldKills;
+		set_data.inhibitorKill = data.inhibitorKills;
 		set_data.ban = data.bans;
 		set_data.win = data.win === "Win" ? true : false;
 		set_data.teamId = data.teamId;
@@ -512,8 +585,8 @@ class TimeLine {
 				set_data[index].assiste = data.participants[i].stats.assists;
 				set_data[index].death = data.participants[i].stats.deaths;
 				set_data[index].gold = data.participants[i].stats.goldEarned;
-				set_data[index].cs = data.participants[i].stats.totalMinionsKilled + data.participants[i].stats.neturalMinionKilled;
-				
+				set_data[index].cs = data.participants[i].stats.totalMinionsKilled + data.participants[i].stats.neutralMinionsKilled;
+
 				set_data[index].items = [];
 				set_data[index].items[0] = data.participants[i].stats.item0;
 				set_data[index].items[1] = data.participants[i].stats.item1;
@@ -816,10 +889,11 @@ class TimeLine {
 			}
 		}
 
-		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		for( var i = 0 ; i < this.TIMELINE_WORK_DATA.frame.length-1 ; ++i )
 		{
-			for( var j in this.TIMELINE_WORK_DATA.frame[i].player[j] )
+			for( var j in this.TIMELINE_WORK_DATA.frame[i].player )
 			{
+
 				for( var k = 0 ; k < this.JSON_DATA_MATCHDETAIL.teams.length ; ++k )
 				{
 					for( var l = 0 ; l < this.JSON_DATA_MATCHDETAIL.teams[k].player.length ; ++l )
@@ -838,6 +912,7 @@ class TimeLine {
 							this.TIMELINE_WORK_DATA.frame[i].team[k].wardKill += this.TIMELINE_WORK_DATA.frame[i].player[j].wardKill;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].wardPlace += this.TIMELINE_WORK_DATA.frame[i].player[j].wardPlace;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].inhibitorKill += this.TIMELINE_WORK_DATA.frame[i].player[j].inhibitorKill;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].buyVisionWard += this.TIMELINE_WORK_DATA.frame[i].player[j].buyVisionWard;
 						}
 					}
 				}
@@ -891,6 +966,9 @@ class TimeLine {
 		var frame = this.TIMELINE_WORK_DATA.frame.length;
 		frame = this.TIMELINE_WORK_DATA.frame.length-1;
 
+		this.ShowWinLose();
+		this.ShowTeamName();
+
 		for( var i = 1 ; i <= 5 ; ++i )
 		{
 			this.ShowChampionImg(i);
@@ -898,6 +976,8 @@ class TimeLine {
 		}
 
 		$('#frame_slidebar').trigger('change');
+
+		this.isShow = true;
 	}
 
 	ShowChampionImg(player_index)
@@ -921,7 +1001,7 @@ class TimeLine {
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
 			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
-			tag = "";
+			//tag = "";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
@@ -1685,6 +1765,303 @@ class TimeLine {
 
 	////////////////////////////////////////////////////////////////////////////////////
 
+	ShowWinLose()
+	{
+		var num = [];
+
+		num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].win ? "Win" : "Lose";
+		num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].win ? "Win" : "Lose";
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > WinLose > " + this.TEAM_TAG[i]).html(num[i]);
+	}
+
+	ShowTeamName()
+	{
+		var num = [
+			this.JSON_DATA_MATCHDETAIL.teams[0].team_name,
+			this.JSON_DATA_MATCHDETAIL.teams[1].team_name,
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > Name > " + this.TEAM_TAG[i]).html(num[i]);
+	}
+
+	ShowTeamKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].kill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].kill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
+	}
+
+	ShowTeamKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].kill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].kill
+		];
+		
+		this.ShowBar($("#team > Kill > canvas")[0], num);
+	}
+
+	ShowTeamDeath(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].death,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].death
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
+	}
+
+	ShowTeamDeathBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].death,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].death
+		];
+		
+		this.ShowBar($("#team > Death > canvas")[0], num);
+	}
+
+	ShowTeamAssiste(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].assiste,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].assiste
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > Assiste > " + this.TEAM_TAG[i]).html("Assiste : " + num[i]);
+	}
+
+	ShowTeamAssisteBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].assiste,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].assiste
+		];
+		
+		this.ShowBar($("#team > Assiste > canvas")[0], num);
+	}
+
+	ShowTeamGold(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].gold,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].gold
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
+	}
+
+	ShowTeamGoldBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].gold,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].gold
+		];
+		
+		this.ShowBar($("#team > Gold > canvas")[0], num);
+	}
+
+	ShowTeamCS(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].cs,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].cs
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > CS > " + this.TEAM_TAG[i]).html("CS : " + num[i]);
+	}
+
+	ShowTeamCSBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].cs,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].cs
+		];
+		
+		this.ShowBar($("#team > CS > canvas")[0], num);
+	}
+
+	ShowTeamDragonKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].dragonKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].dragonKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > DragonKill > " + this.TEAM_TAG[i]).html("DragonKill : " + num[i]);
+	}
+
+	ShowTeamDragonKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].dragonKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].dragonKill
+		];
+		
+		this.ShowBar($("#team > DragonKill > canvas")[0], num);
+	}
+
+	ShowTeamRiftHeraldKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].riftheraldKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].riftheraldKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > RiftHeraldKill > " + this.TEAM_TAG[i]).html("RiftHeraldKill : " + num[i]);
+	}
+
+	ShowTeamRiftHeraldKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].riftheraldKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].riftheraldKill
+		];
+		
+		this.ShowBar($("#team > RiftHeraldKill > canvas")[0], num);
+	}
+
+	ShowTeamBaronKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].baronKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].baronKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > BaronKill > " + this.TEAM_TAG[i]).html("BaronKill : " + num[i]);
+	}
+
+	ShowTeamBaronKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].baronKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].baronKill
+		];
+		
+		this.ShowBar($("#team > BaronKill > canvas")[0], num);
+	}
+
+	ShowTeamTowerKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].turretsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].turretsKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > TowerKill > " + this.TEAM_TAG[i]).html("TowerKill : " + num[i]);
+	}
+
+	ShowTeamTowerKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].turretsKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].turretsKill
+		];
+		
+		this.ShowBar($("#team > TowerKill > canvas")[0], num);
+	}
+	
+	ShowTeamInhibitorKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].inhibitorKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].inhibitorKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > InhibitorKill > " + this.TEAM_TAG[i]).html("InhibitorKill : " + num[i]);
+	}
+
+	ShowTeamInhibitorKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].inhibitorKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].inhibitorKill
+		];
+		
+		this.ShowBar($("#team > InhibitorKill > canvas")[0], num);
+	}
+	
+	ShowTeamWardPlace(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].wardPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].wardPlace
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > WardPlace > " + this.TEAM_TAG[i]).html("Ward Place : " + num[i]);
+	}
+
+	ShowTeamWardPlaceBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].wardPlace,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].wardPlace
+		];
+		
+		this.ShowBar($("#team > WardPlace > canvas")[0], num);
+	}
+	
+	ShowTeamWardKill(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].wardKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].wardKill
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > WardKill > " + this.TEAM_TAG[i]).html("Ward Kill : " + num[i]);
+	}
+
+	ShowTeamWardKillBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].wardKill,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].wardKill
+		];
+		
+		this.ShowBar($("#team > WardKill > canvas")[0], num);
+	}
+	
+	ShowTeamBuyVisionWard(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].buyVisionWard,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].buyVisionWard
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
+	}
+	
+	ShowTeamBuyVisionWardBar(frame)
+	{
+		var num = [
+					this.TIMELINE_WORK_DATA.frame[frame].team[0].buyVisionWard,
+					this.TIMELINE_WORK_DATA.frame[frame].team[1].buyVisionWard
+		];
+		
+		this.ShowBar($("#team > BuyVisionWard > canvas")[0], num);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
 	FloatFormat( number, n )
 	{
 		var _pow = Math.pow( 10 , n ) ;
@@ -1697,14 +2074,46 @@ class TimeLine {
 	ChangeFrame(handle)
 	{
 		var self = handle.data;
-		var frame = $("#frame_slidebar").val();
-		var isEnd = false;
+		self.frame = $("#frame_slidebar").val();
+		var frame = self.frame;
+		self.isEndFrame = false;
 
 		if( frame >= self.JSON_DATA_TIMELINE.frames.length )
-			isEnd = true;
+			self.isEndFrame = true;
 		
+		var isEnd = self.isEndFrame;
+
 		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
 
+		// Team
+		self.ShowTeamKill(frame);
+		self.ShowTeamKillBar(frame);
+		self.ShowTeamDeath(frame);
+		self.ShowTeamDeathBar(frame);
+		self.ShowTeamAssiste(frame);
+		self.ShowTeamAssisteBar(frame);
+		self.ShowTeamGold(frame);
+		self.ShowTeamGoldBar(frame);
+		self.ShowTeamCS(frame);
+		self.ShowTeamCSBar(frame);
+		self.ShowTeamDragonKill(frame);
+		self.ShowTeamDragonKillBar(frame);
+		self.ShowTeamRiftHeraldKill(frame);
+		self.ShowTeamRiftHeraldKillBar(frame);
+		self.ShowTeamBaronKill(frame);
+		self.ShowTeamBaronKillBar(frame);
+		self.ShowTeamTowerKill(frame);
+		self.ShowTeamTowerKillBar(frame);
+		self.ShowTeamInhibitorKill(frame);
+		self.ShowTeamInhibitorKillBar(frame);
+		self.ShowTeamWardPlace(frame);
+		self.ShowTeamWardPlaceBar(frame);
+		self.ShowTeamWardKill(frame);
+		self.ShowTeamWardKillBar(frame);
+		self.ShowTeamBuyVisionWard(frame);
+		self.ShowTeamBuyVisionWardBar(frame);
+
+		// Player
 		for( var i = 1 ; i <= 5 ; ++i )
 		{
 			self.ShowLv(i, frame);
@@ -1777,7 +2186,84 @@ class TimeLine {
 			self.ShowInhibitorKillBar(i, frame);
 		}
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	ResizeBar()
+	{
+		if(!this.isShow)
+			return;
+
+		var isEnd = this.isEndFrame;
+		var frame = this.frame;	
+		
+		this.ShowTeamKillBar(frame);
+		this.ShowTeamDeathBar(frame);
+		this.ShowTeamAssisteBar(frame);
+		this.ShowTeamGoldBar(frame);
+		this.ShowTeamCSBar(frame);
+		this.ShowTeamDragonKillBar(frame);
+		this.ShowTeamRiftHeraldKillBar(frame);
+		this.ShowTeamBaronKillBar(frame);
+		this.ShowTeamTowerKillBar(frame);
+		this.ShowTeamInhibitorKillBar(frame);
+		this.ShowTeamWardPlaceBar(frame);
+		this.ShowTeamWardKillBar(frame);
+		this.ShowTeamBuyVisionWardBar(frame);
+		
+		for( var i = 1 ; i <= 5 ; ++i )
+		{
+			this.ShowLvBar(i, frame);
+			this.ShowXpBar(i, frame, !isEnd);
+			this.ShowGoldBar(i, frame);
+			this.ShowCSBar(i, frame);
+			this.ShowMinionCSBar(i, frame, !isEnd);
+			this.ShowJungleMinionCSBar(i, frame, !isEnd);
+			this.ShowKillBar(i, frame);
+			this.ShowDeathBar(i, frame);
+			this.ShowAssisteBar(i, frame);
+			this.ShowPhysicalDamageDealtToChampionBar(i, frame, isEnd);
+			this.ShowPhysicalDamageDealtToPlayerBar(i, frame, isEnd);
+			this.ShowMagicDamageDealtToChampionBar(i, frame, isEnd);
+			this.ShowMagicDamageDealtToPlayerBar(i, frame, isEnd);
+			this.ShowTrueDamageDealtToChampionBar(i, frame, isEnd);
+			this.ShowTrueDamageDealtToPlayerBar(i, frame, isEnd);
+			this.ShowTotalDamageDealtBar(i, frame, isEnd);
+			this.ShowTotalDamageDealtToBuildingBar(i, frame, isEnd);
+			this.ShowTotalDamageDealtToChampionBar(i, frame, isEnd);
+			this.ShowTotalCrawdControlDamageDealtBar(i, frame, isEnd);
+			this.ShowPhysicalDamageTakenBar(i, frame, isEnd);
+			this.ShowMagicDamageTakenBar(i, frame, isEnd);
+			this.ShowTrueDamageTakenBar(i, frame, isEnd);
+			this.ShowTotalDamageTakenBar(i, frame, isEnd);
+			this.ShowTotalHealBar(i, frame, isEnd);
+			this.ShowTotalHealToUnitBar(i, frame, isEnd);
+			this.ShowTowerKillBar(i, frame);
+			this.ShowBuyVisionWardBar(i, frame);
+			this.ShowWardPlaceBar(i, frame, isEnd);
+			this.ShowWardKillBar(i, frame);
+			this.ShowDragonKillBar(i, frame);
+			this.ShowRiftheraldKillBar(i, frame);
+			this.ShowBaronKillBar(i, frame);
+			this.ShowInhibitorKillBar(i, frame);
+		}
+		console.log("Resize");
+	}
 }
 
 var timeline = new TimeLine();
 timeline.Init(location.href);
+
+var resizeTimer;
+var interval = Math.floor(1000 / 60 * 10);
+
+$(window).on('resize', function()
+{
+	if (resizeTimer !== false)
+		clearTimeout(resizeTimer);
+  
+	resizeTimer = setTimeout(function ()
+	{
+		timeline.ResizeBar();
+	}, interval);
+});
