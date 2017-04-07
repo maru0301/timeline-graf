@@ -371,9 +371,9 @@ class TimeLine {
 			{	name:"TotalDamageDealtToChampion",			isCanvas:true	},
 			{	name:"TotalCrawdControlDamageDealt",		isCanvas:true	},
 			{	name:"TotalDamageTaken",					isCanvas:true	},
-			{	name:"PhysicalDamageTaken",					isCanvas:true	},
-			{	name:"MagicDamageTaken",					isCanvas:true	},
-			{	name:"TrueDamageTaken",						isCanvas:true	},
+			//{	name:"PhysicalDamageTaken",					isCanvas:true	},
+			//{	name:"MagicDamageTaken",					isCanvas:true	},
+			//{	name:"TrueDamageTaken",						isCanvas:true	},
 			{	name:"TotalHeal",							isCanvas:true	},
 			{	name:"TotalHealToUnit",						isCanvas:true	},
 		];
@@ -558,9 +558,9 @@ class TimeLine {
 				//set_data[index].totalDamageDealtToBuildings = data.participants[i].stats.totalDamageDealtToBuildings || 0;
 				set_data[index].totalDamageDealtToChampions = data.participants[i].stats.totalDamageDealtToChampions || 0;
 				// 受けたダメージ
-				set_data[index].physicalDamageTaken = data.participants[i].stats.physicalDamageTaken || 0;
-				set_data[index].magicDamageTaken = data.participants[i].stats.magicDamageTaken || 0;
-				set_data[index].trueDamageTaken = data.participants[i].stats.trueDamageTaken || 0;
+				//set_data[index].physicalDamageTaken = data.participants[i].stats.physicalDamageTaken || 0;
+				//set_data[index].magicDamageTaken = data.participants[i].stats.magicDamageTaken || 0;
+				//set_data[index].trueDamageTaken = data.participants[i].stats.trueDamageTaken || 0;
 				set_data[index].totalDamageTaken = data.participants[i].stats.totalDamageTaken || 0;
 				// 回復
 				set_data[index].totalHeal = data.participants[i].stats.totalHeal || 0; // 合計回復量
@@ -1436,7 +1436,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > TotalDamageTaken > canvas")[0], num, isVisible);
 	}
-
+	/*
 	ShowPhysicalDamageTaken(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1499,7 +1499,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > TrueDamageTaken > canvas")[0], num, isVisible);
 	}
-	
+	*/
 	ShowTotalHeal(player_index, frame, isVisible)
 	{
 		var num = [
@@ -2303,9 +2303,9 @@ class TimeLine {
 			//this.ShowTotalDamageDealtToBuilding(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampion(player_index, frame, isEnd);
 			this.ShowTotalCrawdControlDamageDealt(player_index, frame, isEnd);
-			this.ShowPhysicalDamageTaken(player_index, frame, isEnd);
-			this.ShowMagicDamageTaken(player_index, frame, isEnd);
-			this.ShowTrueDamageTaken(player_index, frame, isEnd);
+			//this.ShowPhysicalDamageTaken(player_index, frame, isEnd);
+			//this.ShowMagicDamageTaken(player_index, frame, isEnd);
+			//this.ShowTrueDamageTaken(player_index, frame, isEnd);
 			this.ShowTotalDamageTaken(player_index, frame, isEnd);
 			this.ShowTotalHeal(player_index, frame, isEnd);
 			this.ShowTotalHealToUnit(player_index, frame, isEnd);
@@ -2365,9 +2365,9 @@ class TimeLine {
 			//this.ShowTotalDamageDealtToBuildingBar(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampionBar(player_index, frame, isEnd);
 			this.ShowTotalCrawdControlDamageDealtBar(player_index, frame, isEnd);
-			this.ShowPhysicalDamageTakenBar(player_index, frame, isEnd);
-			this.ShowMagicDamageTakenBar(player_index, frame, isEnd);
-			this.ShowTrueDamageTakenBar(player_index, frame, isEnd);
+			//this.ShowPhysicalDamageTakenBar(player_index, frame, isEnd);
+			//this.ShowMagicDamageTakenBar(player_index, frame, isEnd);
+			//this.ShowTrueDamageTakenBar(player_index, frame, isEnd);
 			this.ShowTotalDamageTakenBar(player_index, frame, isEnd);
 			this.ShowTotalHealBar(player_index, frame, isEnd);
 			this.ShowTotalHealToUnitBar(player_index, frame, isEnd);
