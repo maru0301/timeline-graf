@@ -60,10 +60,8 @@ class TimeLine {
 		var gameHash = url;
 
 		var request = [
-			//{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
-			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './data/wcs.json', data: {},  },
-			//{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
-			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './data/wcs_timeline.json', data: {},  },
+			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
+			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
 		];
 
@@ -136,14 +134,7 @@ class TimeLine {
 			}
 			*/
 			self.JSON_DATA_MATCHDETAIL = matchDetailData;
-			/*
-			console.log("------- json -------");
-			console.log(json);
-			console.log("------- matchDetailData -------");
-			console.log(matchDetailJson);
-			console.log("------- matchTimelineJson -------");
-			console.log(self.JSON_DATA_TIMELINE);
-			*/
+			
 			for( var i in self.JSON_DATA_TIMELINE.frames )
 			{
 				self.JSON_DATA_TIMELINE.frames[i].events = self.JSON_DATA_TIMELINE.frames[i].events.filter(function(a){
@@ -292,11 +283,13 @@ class TimeLine {
 			{	name:"Name", 			isCanvas:false	},
 			{	name:"Kill",			isCanvas:true	},
 			{	name:"Death",			isCanvas:true	},
-			{	name:"Assiste",			isCanvas:true	},
+			{	name:"Assist",			isCanvas:true	},
 			{	name:"Gold",			isCanvas:true	},
 			{	name:"CS",				isCanvas:true	},
 			{	name:"MinionCS",		isCanvas:true	},
 			{	name:"JungleCS",		isCanvas:true	},
+			{	name:"JungleCSEnemy",	isCanvas:true	},
+			{	name:"JungleCSTeam",	isCanvas:true	},
 			{	name:"DragonKill",		isCanvas:true	},
 			{	name:"RiftHeraldKill",	isCanvas:true	},
 			{	name:"BaronKill",		isCanvas:true	},
@@ -343,6 +336,8 @@ class TimeLine {
 			{	name:"CS",					isCanvas:true	},
 			{	name:"MinionCS",			isCanvas:true	},
 			{	name:"JungleCS",			isCanvas:true	},
+			{	name:"JungleCSEnemy",		isCanvas:true	},
+			{	name:"JungleCSTeam",		isCanvas:true	},
 			{	name:"DragonKill",			isCanvas:true	},
 			{	name:"RiftHeraldKill",		isCanvas:true	},
 			{	name:"BaronKill",			isCanvas:true	},
@@ -359,13 +354,13 @@ class TimeLine {
 			{	name:"BuyVisionWard",		isCanvas:true	},
 			{	name:"Kill",				isCanvas:true	},
 			{	name:"Death",				isCanvas:true	},
-			{	name:"Assiste",				isCanvas:true	},
-			{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
-			{	name:"PhysicalDamageDealtToPlayer",			isCanvas:true	},
-			{	name:"MagicDamageDealtToChampion",			isCanvas:true	},
-			{	name:"MagicDamageDealtToPlayer",			isCanvas:true	},
-			{	name:"TrueDamageDealtToChampion",			isCanvas:true	},
-			{	name:"TrueDamageDealtToPlayer",				isCanvas:true	},
+			{	name:"Assist",				isCanvas:true	},
+			//{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
+			//{	name:"PhysicalDamageDealtToPlayer",			isCanvas:true	},
+			//{	name:"MagicDamageDealtToChampion",			isCanvas:true	},
+			//{	name:"MagicDamageDealtToPlayer",			isCanvas:true	},
+			//{	name:"TrueDamageDealtToChampion",			isCanvas:true	},
+			//{	name:"TrueDamageDealtToPlayer",				isCanvas:true	},
 			//{	name:"TotalDamageDealt",					isCanvas:true	},
 			//{	name:"TotalDamageDealtToBuilding",			isCanvas:true	},
 			{	name:"TotalDamageDealtToChampion",			isCanvas:true	},
@@ -413,7 +408,7 @@ class TimeLine {
 		var target = document.getElementById("slidebar");
 		var max = this.JSON_DATA_TIMELINE.frames.length;
 		var self = this;
-		target.innerHTML = "<input type='range' id='frame_slidebar' min='0' max='"+ max +"' step='1' value='" + max + "'><span id ='frame'></span>";
+		target.innerHTML = "<span id ='frame'></span><br><input type='range' id='frame_slidebar' min='0' max='"+ max +"' step='1' value='" + max + "'>";
 		$("#frame_slidebar").change(self, self.ChangeFrame);
 	}
 
@@ -432,10 +427,12 @@ class TimeLine {
 
 			set_data[i].kill = 0;
 			set_data[i].death = 0;
-			set_data[i].assiste = 0;
+			set_data[i].assist = 0;
 			set_data[i].gold = 0;
 			set_data[i].cs = 0;
 			set_data[i].jungleMinionKill = 0;
+			set_data[i].neutralMinionsKilledEnemyJungle = 0;
+			set_data[i].neutralMinionsKilledTeamJungle = 0;
 			set_data[i].minionKill = 0;
 			set_data[i].wardPlace = 0;
 			set_data[i].wardPlaceWard = 0;
@@ -451,10 +448,12 @@ class TimeLine {
 			{
 				set_data[i].kill += set_data[i].player[j].kill;
 				set_data[i].death += set_data[i].player[j].death;
-				set_data[i].assiste += set_data[i].player[j].assiste;
+				set_data[i].assist += set_data[i].player[j].assist;
 				set_data[i].gold += set_data[i].player[j].gold;
 				set_data[i].cs += set_data[i].player[j].cs;
 				set_data[i].jungleMinionKill += set_data[i].player[j].jungleMinionKill;
+				set_data[i].neutralMinionsKilledEnemyJungle += set_data[i].player[j].neutralMinionsKilledEnemyJungle;
+				set_data[i].neutralMinionsKilledTeamJungle += set_data[i].player[j].neutralMinionsKilledTeamJungle;
 				set_data[i].minionKill += set_data[i].player[j].minionKill;
 				set_data[i].wardPlace += set_data[i].player[j].wardPlace;
 				set_data[i].wardKill += set_data[i].player[j].wardKill;
@@ -506,7 +505,7 @@ class TimeLine {
 				set_data[index].lv = data.participants[i].stats.champLevel;
 
 				set_data[index].kill = data.participants[i].stats.kills;
-				set_data[index].assiste = data.participants[i].stats.assists;
+				set_data[index].assist = data.participants[i].stats.assists;
 				set_data[index].death = data.participants[i].stats.deaths;
 				set_data[index].gold = data.participants[i].stats.goldEarned;
 				set_data[index].cs = data.participants[i].stats.totalMinionsKilled + data.participants[i].stats.neutralMinionsKilled;
@@ -545,12 +544,12 @@ class TimeLine {
 				set_data[index].wardKill = data.participants[i].stats.wardsKilled || 0;
 				set_data[index].wardPlace = data.participants[i].stats.wardsPlaced || 0;
 				// 与えたダメージ
-				set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
-				set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
-				set_data[index].magicDamageDealtToChampions = data.participants[i].stats.magicDamageDealtToChampions || 0; // 与えたメージ量(魔法)
-				set_data[index].magicDamageDealtPlayer = data.participants[i].stats.magicDamageDealtPlayer || 0;
-				set_data[index].trueDamageDealtToChampions = data.participants[i].stats.trueDamageDealtToChampions || 0; // 与えたメージ量(確定ダメージ)
-				set_data[index].trueDamageDealtToPlayer = data.participants[i].stats.trueDamageDealtPlayer || 0;
+				//set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
+				//set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
+				//set_data[index].magicDamageDealtToChampions = data.participants[i].stats.magicDamageDealtToChampions || 0; // 与えたメージ量(魔法)
+				//set_data[index].magicDamageDealtPlayer = data.participants[i].stats.magicDamageDealtPlayer || 0;
+				//set_data[index].trueDamageDealtToChampions = data.participants[i].stats.trueDamageDealtToChampions || 0; // 与えたメージ量(確定ダメージ)
+				//set_data[index].trueDamageDealtToPlayer = data.participants[i].stats.trueDamageDealtPlayer || 0;
 				set_data[index].totalTimeCrowdControlDealt = data.participants[i].stats.totalTimeCrowdControlDealt || 0;
 				// set_data[index].largestCriticalStrike = data.participants[i].stats.largestCriticalStrike || 0; // 最大クリティカルダメージ
 				
@@ -578,6 +577,7 @@ class TimeLine {
 				set_data[index].wardKillTrinket = 0;
 
 				index++;
+
 				continue;
 			}
 		}
@@ -603,7 +603,7 @@ class TimeLine {
 				this.TIMELINE_WORK_DATA.frame[i].team[j].minionKill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].kill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].death = 0;
-				this.TIMELINE_WORK_DATA.frame[i].team[j].assiste = 0;
+				this.TIMELINE_WORK_DATA.frame[i].team[j].assist = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].dragonKill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].riftheraldKill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].baronKill = 0;
@@ -632,7 +632,7 @@ class TimeLine {
 				this.TIMELINE_WORK_DATA.frame[i].player[j].cs = this.TIMELINE_WORK_DATA.frame[i].player[j].jungleMinionKill + this.TIMELINE_WORK_DATA.frame[i].player[j].minionKill;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].kill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].death = 0;
-				this.TIMELINE_WORK_DATA.frame[i].player[j].assiste = 0;
+				this.TIMELINE_WORK_DATA.frame[i].player[j].assist = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].dragonKill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].riftheraldKill = 0;
 				this.TIMELINE_WORK_DATA.frame[i].player[j].baronKill = 0;
@@ -681,15 +681,15 @@ class TimeLine {
 						
 						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
-						var assisteId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
+						var assistId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
 						
 						if(killerId != 0)
 							set_work_frame.player[killerId].kill++;
 						
 						set_work_frame.player[deathId].death++;
 
-						for( var k = 0 ; k < assisteId.length ; ++k )
-							set_work_frame.player[assisteId[k]].assiste++;
+						for( var k = 0 ; k < assistId.length ; ++k )
+							set_work_frame.player[assistId[k]].assist++;
 
 						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 						{
@@ -698,8 +698,8 @@ class TimeLine {
 							
 							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death++;
 							
-							for( var l = 0 ; l < assisteId.length ; ++l )
-								this.TIMELINE_WORK_DATA.frame[k].player[assisteId[l]].assiste++;
+							for( var l = 0 ; l < assistId.length ; ++l )
+								this.TIMELINE_WORK_DATA.frame[k].player[assistId[l]].assist++;
 						}
 						break;
 					case "ELITE_MONSTER_KILL" :
@@ -909,7 +909,7 @@ class TimeLine {
 							this.TIMELINE_WORK_DATA.frame[i].team[k].cs += this.TIMELINE_WORK_DATA.frame[i].player[j].cs;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].kill += this.TIMELINE_WORK_DATA.frame[i].player[j].kill;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].death += this.TIMELINE_WORK_DATA.frame[i].player[j].death;
-							this.TIMELINE_WORK_DATA.frame[i].team[k].assiste += this.TIMELINE_WORK_DATA.frame[i].player[j].assiste;
+							this.TIMELINE_WORK_DATA.frame[i].team[k].assist += this.TIMELINE_WORK_DATA.frame[i].player[j].assist;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].dragonKill += this.TIMELINE_WORK_DATA.frame[i].player[j].dragonKill;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].riftheraldKill += this.TIMELINE_WORK_DATA.frame[i].player[j].riftheraldKill;
 							this.TIMELINE_WORK_DATA.frame[i].team[k].baronKill += this.TIMELINE_WORK_DATA.frame[i].player[j].baronKill;
@@ -1122,25 +1122,25 @@ class TimeLine {
 		this.ShowBar($("#player > player"+ player_index +" > Death > canvas")[0], num);
 	}
 
-	ShowAssiste(player_index, frame)
+	ShowAssist(player_index, frame)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assiste,
-			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assiste
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assist,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assist
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Assiste > " + this.TEAM_TAG[i]).html("Assiste : " + num[i]);
+			$("#player > player"+ player_index + " > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
 	}
 
-	ShowAssisteBar(player_index, frame)
+	ShowAssistBar(player_index, frame)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assiste,
-			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assiste
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assist,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assist
 		];
 		
-		this.ShowBar($("#player > player"+ player_index +" > Assiste > canvas")[0], num);
+		this.ShowBar($("#player > player"+ player_index +" > Assist > canvas")[0], num);
 	}
 
 	ShowMinionCS(player_index, frame)
@@ -1205,7 +1205,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > Gold > canvas")[0], num);
 	}
-
+	/*
 	ShowPhysicalDamageDealtToChampion(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1331,7 +1331,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > trueDamageDealtToPlayer > canvas")[0], num, isVisible);
 	}
-	/*
+	
 	ShowTotalDamageDealt(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1835,6 +1835,48 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > WardKillTrinket > canvas")[0], num);
 	}
+	
+	ShowJungleCSEnemy(player_index, frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
+	}
+
+	ShowJungleCSEnemyBar(player_index, frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > JungleCSEnemy > canvas")[0], num, isVisible);
+	}
+	
+	ShowJungleCSTeam(player_index, frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#player > player"+ player_index + " > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
+	}
+
+	ShowJungleCSTeamBar(player_index, frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
+		];
+		
+		this.ShowBar($("#player > player"+ player_index +" > JungleCSTeam > canvas")[0], num, isVisible);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////
 
@@ -1855,7 +1897,7 @@ class TimeLine {
 
 		if( isVisible )
 		{
-			target.width = window.innerWidth-30;
+			target.width = $("body").width();
 			target.height = 20;
 
 			ctx.save();
@@ -1874,15 +1916,29 @@ class TimeLine {
 			var red_width = target.width - blue_width;
 			ctx.fillRect(blue_width, 0, red_width, target.height);
 
-			ctx.beginPath();
-			ctx.fillStyle = 'rgb(255, 255, 255)';
 			var blue_par = this.FloatFormat(per * 100, 1);
 			var text_b = blue_par + "%";
-			ctx.beginPath();
-			ctx.fillText(text_b, Math.floor(blue_width/2), 16, blue_width);
 			var red_par = this.FloatFormat(100 - blue_par, 1);
 			var text_r = red_par + "%";
-			ctx.fillText(text_r, Math.floor(blue_width + (red_width/2)), 16, red_width);
+			var blue_x = Math.floor(blue_width/2);
+			var red_x = Math.floor(blue_width + (red_width/2));
+
+			ctx.beginPath();
+			ctx.fillStyle = 'rgb(0, 0, 0)';
+
+			ctx.fillText(text_b, blue_x+1, 16+1, blue_width);
+			ctx.fillText(text_b, blue_x-1, 16+1, blue_width);
+
+			ctx.beginPath();
+			ctx.fillText(text_r, red_x+1, 16+1, red_width);
+			ctx.fillText(text_r, red_x-1, 16+1, red_width);
+			
+			ctx.beginPath();
+			ctx.fillStyle = 'rgb(255, 255, 255)';
+			ctx.fillText(text_b, blue_x, 16, blue_width);
+
+			ctx.beginPath();
+			ctx.fillText(text_r, red_x, 16, red_width);
 
 			ctx.restore();
 		}
@@ -1917,7 +1973,7 @@ class TimeLine {
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Name > " + this.TEAM_TAG[i]).html(num[i]);
+			$("#team > Name > " + this.TEAM_TAG[i]).html(num[i] + ((i == this.TEAM_TAG.length -1) ? "<br>" : ""));
 	}
 
 	ShowTeamKill(frame)
@@ -1962,25 +2018,25 @@ class TimeLine {
 		this.ShowBar($("#team > Death > canvas")[0], num);
 	}
 
-	ShowTeamAssiste(frame)
+	ShowTeamAssist(frame)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].team[0].assiste,
-			this.TIMELINE_WORK_DATA.frame[frame].team[1].assiste
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].assist,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].assist
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Assiste > " + this.TEAM_TAG[i]).html("Assiste : " + num[i]);
+			$("#team > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
 	}
 
-	ShowTeamAssisteBar(frame)
+	ShowTeamAssistBar(frame)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].team[0].assiste,
-			this.TIMELINE_WORK_DATA.frame[frame].team[1].assiste
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].assist,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].assist
 		];
 		
-		this.ShowBar($("#team > Assiste > canvas")[0], num);
+		this.ShowBar($("#team > Assist > canvas")[0], num);
 	}
 
 	ShowTeamGold(frame)
@@ -2235,6 +2291,48 @@ class TimeLine {
 		this.ShowBar($("#team > MinionCS > canvas")[0], num);
 	}
 
+	ShowTeamJungleCSEnemy(frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
+	}
+	
+	ShowTeamJungleCSEnemyBar(frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+		];
+		
+		this.ShowBar($("#team > JungleCSEnemy > canvas")[0], num, isVisible);
+	}
+
+	ShowTeamJungleCSTeam(frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+		];
+
+		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+			$("#team > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
+	}
+	
+	ShowTeamJungleCSTeamBar(frame, isVisible)
+	{
+		var num = [
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+		];
+		
+		this.ShowBar($("#team > JungleCSTeam > canvas")[0], num, isVisible);
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////
 
 	FloatFormat( number, n )
@@ -2258,7 +2356,7 @@ class TimeLine {
 		
 		var isEnd = self.isEndFrame;
 
-		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
+		document.getElementById("frame").innerHTML = "&nbsp;&nbsp;&nbsp;" + (isEnd ? "End Game" : frame + ":00");
 
 		self.ChangeParam(frame, isEnd);
 		self.ChangeBar(frame, isEnd);
@@ -2268,7 +2366,7 @@ class TimeLine {
 	{
 		this.ShowTeamKill(frame);
 		this.ShowTeamDeath(frame);
-		this.ShowTeamAssiste(frame);
+		this.ShowTeamAssist(frame);
 		this.ShowTeamGold(frame);
 		this.ShowTeamCS(frame);
 		this.ShowTeamDragonKill(frame);
@@ -2281,6 +2379,8 @@ class TimeLine {
 		this.ShowTeamBuyVisionWard(frame);
 		this.ShowTeamJungleCS(frame);
 		this.ShowTeamMinionCS(frame);
+		this.ShowTeamJungleCSEnemy(frame, isEnd);
+		this.ShowTeamJungleCSTeam(frame, isEnd);
 
 		for(var player_index = 1 ; player_index <= 5 ; ++player_index )
 		{
@@ -2290,15 +2390,17 @@ class TimeLine {
 			this.ShowCS(player_index, frame);
 			this.ShowMinionCS(player_index, frame);
 			this.ShowJungleMinionCS(player_index, frame);
+			this.ShowJungleCSEnemy(player_index, frame, isEnd);
+			this.ShowJungleCSTeam(player_index, frame, isEnd);
 			this.ShowKill(player_index, frame);
 			this.ShowDeath(player_index, frame);
-			this.ShowAssiste(player_index, frame);
-			this.ShowPhysicalDamageDealtToChampion(player_index, frame, isEnd);
-			this.ShowPhysicalDamageDealtToPlayer(player_index, frame, isEnd);
-			this.ShowMagicDamageDealtToChampion(player_index, frame, isEnd);
-			this.ShowMagicDamageDealtToPlayer(player_index, frame, isEnd);
-			this.ShowTrueDamageDealtToChampion(player_index, frame, isEnd);
-			this.ShowTrueDamageDealtToPlayer(player_index, frame, isEnd);
+			this.ShowAssist(player_index, frame);
+			//this.ShowPhysicalDamageDealtToChampion(player_index, frame, isEnd);
+			//this.ShowPhysicalDamageDealtToPlayer(player_index, frame, isEnd);
+			//this.ShowMagicDamageDealtToChampion(player_index, frame, isEnd);
+			//this.ShowMagicDamageDealtToPlayer(player_index, frame, isEnd);
+			//this.ShowTrueDamageDealtToChampion(player_index, frame, isEnd);
+			//this.ShowTrueDamageDealtToPlayer(player_index, frame, isEnd);
 			//this.ShowTotalDamageDealt(player_index, frame, isEnd);
 			//this.ShowTotalDamageDealtToBuilding(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampion(player_index, frame, isEnd);
@@ -2330,7 +2432,7 @@ class TimeLine {
 	{
 		this.ShowTeamKillBar(frame);
 		this.ShowTeamDeathBar(frame);
-		this.ShowTeamAssisteBar(frame);
+		this.ShowTeamAssistBar(frame);
 		this.ShowTeamGoldBar(frame);
 		this.ShowTeamCSBar(frame);
 		this.ShowTeamDragonKillBar(frame);
@@ -2343,6 +2445,8 @@ class TimeLine {
 		this.ShowTeamBuyVisionWardBar(frame);
 		this.ShowTeamJungleCSBar(frame);
 		this.ShowTeamMinionCSBar(frame);
+		this.ShowTeamJungleCSEnemyBar(frame, isEnd);
+		this.ShowTeamJungleCSTeamBar(frame, isEnd);
 
 		for(var player_index = 1 ; player_index <= 5 ; ++player_index )
 		{
@@ -2352,15 +2456,17 @@ class TimeLine {
 			this.ShowCSBar(player_index, frame);
 			this.ShowMinionCSBar(player_index, frame, !isEnd);
 			this.ShowJungleMinionCSBar(player_index, frame, !isEnd);
+			this.ShowJungleCSEnemyBar(player_index, frame, isEnd);
+			this.ShowJungleCSTeamBar(player_index, frame, isEnd);
 			this.ShowKillBar(player_index, frame);
 			this.ShowDeathBar(player_index, frame);
-			this.ShowAssisteBar(player_index, frame);
-			this.ShowPhysicalDamageDealtToChampionBar(player_index, frame, isEnd);
-			this.ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isEnd);
-			this.ShowMagicDamageDealtToChampionBar(player_index, frame, isEnd);
-			this.ShowMagicDamageDealtToPlayerBar(player_index, frame, isEnd);
-			this.ShowTrueDamageDealtToChampionBar(player_index, frame, isEnd);
-			this.ShowTrueDamageDealtToPlayerBar(player_index, frame, isEnd);
+			this.ShowAssistBar(player_index, frame);
+			//this.ShowPhysicalDamageDealtToChampionBar(player_index, frame, isEnd);
+			//this.ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isEnd);
+			//this.ShowMagicDamageDealtToChampionBar(player_index, frame, isEnd);
+			//this.ShowMagicDamageDealtToPlayerBar(player_index, frame, isEnd);
+			//this.ShowTrueDamageDealtToChampionBar(player_index, frame, isEnd);
+			//this.ShowTrueDamageDealtToPlayerBar(player_index, frame, isEnd);
 			//this.ShowTotalDamageDealtBar(player_index, frame, isEnd);
 			//this.ShowTotalDamageDealtToBuildingBar(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampionBar(player_index, frame, isEnd);
