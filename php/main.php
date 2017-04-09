@@ -27,7 +27,8 @@ class RiotApi
 	public function GetChampionImage()
 	{
 		$version = $_GET['ver'];
-		$json = $this->GetJson('https://global.api.pvp.net/api/lol/static-data/jp/v1.2/champion?version=' . $version . '&champData=image&api_key=');
+		
+		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/champions?champData=image&version=' . $version . '&api_key=');
 		
 		return $json;
 	}

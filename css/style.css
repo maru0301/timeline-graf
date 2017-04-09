@@ -15,11 +15,17 @@ body {
 }
 
 video {
-	position: fixed; right: 0; bottom: 0;
-	min-width: 100%; min-height: 100%;
-	width: auto; height: auto;
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	min-width: 100%;
+	min-height: 100%;
+	width: auto;
+	height: auto;
 	background-size: cover;
 	z-index: -100;
+	background: url(../data/bg_index.jpg) no-repeat;
+	background-size: 100%;
 }
 
 .bg{
@@ -85,7 +91,7 @@ section p {
 */
 
 .bg_next {
-	background-image: url("../data/bg.jpg");
+	background-image: url("../data/bg_next.jpg");
 	background-position: center center;
 	position: fixed;
 	background-attachment: fixed;

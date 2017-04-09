@@ -39,6 +39,8 @@ class TimeLine {
 		var set_data = {};
 
 		set_data.gameVer = data.gameVersion;
+		set_data.gameMode = data.gameMode;
+		set_data.gameType = data.gameType;
 		
 		return set_data;
 	}
@@ -63,6 +65,7 @@ class TimeLine {
 			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
 			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
+			{ error_id: this.ERROR_ID_CHAMPION_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetChampionImage", ver:this.VERSION },  },
 		];
 
 		var jqXHRList = [];
@@ -95,44 +98,64 @@ class TimeLine {
 			var matchDetailJson = json[0];
 			self.JSON_DATA_TIMELINE = json[1];
 			var versionJson = json[2];
+			var champImgJson = json[3];
+
+			var championImgData = new Array();
+
+			for(var key in champImgJson.data)
+				self.JSON_DATA_CHAMP_IMG.push(champImgJson.data[key]);
 
 			var matchDetailData = { game:{}, teams:[] };
 			matchDetailData.game = self.GetMatchData(matchDetailJson);
 			matchDetailData.teams = self.GetTeamData(matchDetailJson);
-			/*
-			var lane = ["TOP","JUNGLE","MIDDLE","BOTTOM", "BOTTOM"];
-			var sub = ["DUO_CARRY", "DUO_SUPPORT"];
-			var work = [];
+			
+			var isSort = false;
 
-			for( var i = 0 ; i < matchDetailData.teams.length ; ++i )
+			switch(matchDetailData.game.gameMode)
 			{
-				work[i] = [];
-				for( var j = 0, sub_index = 0 ; j < lane.length ; ++j )
+				case "CLASSIC":
+					if(matchDetailData.game.gameType == "MATCHED_GAME")
+						isSort = true;
+					break;
+			}
+
+			if(isSort)
+			{
+				var lane = ["TOP","JUNGLE","MIDDLE","BOTTOM", "BOTTOM"];
+				var sub = ["DUO_CARRY", "DUO_SUPPORT"];
+				var work = [];
+
+				for( var i = 0 ; i < matchDetailData.teams.length ; ++i )
 				{
-					for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
+					work[i] = [];
+					for( var j = 0, sub_index = 0 ; j < lane.length ; ++j )
 					{
-						if( lane[j] == matchDetailData.teams[i].player[k].lane )
+						for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
 						{
-							if( lane[j] != "BOTTOM" )
+							if( lane[j] == matchDetailData.teams[i].player[k].lane )
 							{
-								work[i][j] = matchDetailData.teams[i].player[k];
-								break;
-							}
-							else if(sub[sub_index] == matchDetailData.teams[i].player[k].sub_lane)
-							{
-								work[i][j] = matchDetailData.teams[i].player[k];
-								sub_index++;
-								break;
+								if( lane[j] != "BOTTOM" )
+								{
+									work[i][j] = matchDetailData.teams[i].player[k];
+									break;
+								}
+								else if(sub[sub_index] == matchDetailData.teams[i].player[k].sub_lane)
+								{
+									work[i][j] = matchDetailData.teams[i].player[k];
+									sub_index++;
+									break;
+								}
 							}
 						}
 					}
 				}
+
+				for( var i = 0 ; i < work.length ; ++i )
+				{
+					matchDetailData.teams[i].player = work[i];
+				}
 			}
-			for( var i = 0 ; i < work.length ; ++i )
-			{
-				matchDetailData.teams[i].player = work[i];
-			}
-			*/
+			
 			self.JSON_DATA_MATCHDETAIL = matchDetailData;
 			
 			for( var i in self.JSON_DATA_TIMELINE.frames )
@@ -175,7 +198,6 @@ class TimeLine {
 
 		var request = [
 			{ error_id: this.ERROR_ID_REALM_GET_ERROR,			url: './php/main.php', data: { func:"GetRealm" },  },
-			{ error_id: this.ERROR_ID_CHAMPION_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetChampionImage", ver:this.VERSION },  },
 			{ error_id: this.ERROR_ID_ITEM_IMG_GET_ERROR,		url: './php/main.php', data: { func:"GetItem", ver:this.VERSION },  },
 		];
 
@@ -209,15 +231,9 @@ class TimeLine {
 			}
 
 			var realmJson = json[0];
-			var champImgJson = json[1];
-			var itemImgJson = json[2];
+			var itemImgJson = json[1];
 
-			var championImgData = new Array();
 			var itemImgImgData = new Array();
-
-			// ソート
-			for(var key in champImgJson.data)
-				self.JSON_DATA_CHAMP_IMG.push(champImgJson.data[key]);
 			
 			self.JSON_DATA_CHAMP_IMG.sort(function(a, b)
 			{
@@ -225,6 +241,7 @@ class TimeLine {
 					if(a.key > b.key) return 1;
 					if(a.key == b.key) return 0;
 			});
+			// ソート
 			
 			for(var key in itemImgJson.data)
 				itemImgImgData[key] = itemImgJson.data[key];
@@ -252,6 +269,31 @@ class TimeLine {
 			self.CDN_URL = realmJson.cdn;
 
 			self.SetTimiLineFrameData(self.JSON_DATA_MATCHDETAIL);
+
+			var id = [];
+
+			for(var i = 0 ; i < self.JSON_DATA_MATCHDETAIL.teams.length ; ++i)
+			{
+				for(var j = 0 ; j < self.JSON_DATA_MATCHDETAIL.teams[i].player.length ; ++j)
+				{
+					id.push(self.JSON_DATA_MATCHDETAIL.teams[i].player[j].participantId);
+				}
+			}
+
+			var data = new Array();
+			for(var i = 0 ; i < self.TIMELINE_WORK_DATA.frame.length ; ++i)
+			{
+				for(var j = 0 ; j < id.length ; ++j)
+				{
+					for(var k in self.TIMELINE_WORK_DATA.frame[i].player)
+					{
+						if( id[j] == self.TIMELINE_WORK_DATA.frame[i].player[k].participantId )
+							data[j+1] = self.TIMELINE_WORK_DATA.frame[i].player[k];
+					}
+				}
+				self.TIMELINE_WORK_DATA.frame[i].player = data;
+				data = [];
+			}
 
 			self.InitTeam();
 			self.InitPlayer();
@@ -530,15 +572,27 @@ class TimeLine {
 				{
 					if( set_data[index].participantId == data.participantIdentities[j].participantId )
 					{
-						set_data[index].name = data.participantIdentities[j].player.summonerName;
+						if(data.participantIdentities[j].player == undefined || data.participantIdentities[j].player.summonerName == undefined)
+						{
+							set_data[index].name = this.GetChampionName(data.participants[j].championId);
+						}
+						else
+						{
+							set_data[index].name = data.participantIdentities[j].player.summonerName;
+						}
+
 						break;
 					}
 				}
 
 				set_data[index].mastery = [];
-				for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
-					set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
-				
+
+				if( data.participants[i].masteries != undefined )
+				{
+					for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
+						set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
+				}
+
 				set_data[index].turretsKill = data.participants[i].stats.turretKills || 0; // 破壊タレット数
 				set_data[index].buyVisionWard = data.participants[i].stats.visionWardsBoughtInGame || 0;
 				set_data[index].wardKill = data.participants[i].stats.wardsKilled || 0;
@@ -929,29 +983,23 @@ class TimeLine {
 	
 	GetVersion(ver, json)
 	{
-		var num = json.length;
+		var version = ver;
 
-		while(--num)
+		if(version == undefined)
+			return json[0];
+
+		while(1)
 		{
-			if(ver.indexOf(json[num]) !== -1)
+			for(var i = 0 ; i < json.length ; ++i)
 			{
-				return json[num];
+				if(version.indexOf(json[i]) !== -1)
+					return json[i];
 			}
-		}
 
-		num = json.length;
-		var str_num = ver.length;
-
-		while(str_num)
-		{
-			while(--num)
-			{
-				if(json[num].match(ver))
-					return json[num];
-			}
-			num = json.length;
-			str_num--;
-			ver = ver.substr(0, str_num);
+			if(version.length-1 > 0)
+				version = version.substr(0, version.length-1);
+			else
+				return json[0];
 		}
 	}
 
@@ -961,6 +1009,15 @@ class TimeLine {
 		{
 			if ( id == this.JSON_DATA_CHAMP_IMG[i].id )
 				return this.JSON_DATA_CHAMP_IMG[i].image.full;
+		}
+	}
+
+	GetChampionName(id)
+	{
+		for( var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i )
+		{
+			if ( id == this.JSON_DATA_CHAMP_IMG[i].id )
+				return this.JSON_DATA_CHAMP_IMG[i].name;
 		}
 	}
 
@@ -1006,7 +1063,6 @@ class TimeLine {
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
 			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
-			//tag = "";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
