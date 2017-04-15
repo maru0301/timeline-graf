@@ -52,6 +52,7 @@ header, nav, section, footer {
 
 header {
 	text-align:center;
+	
 	background-color: rgba(25,25,25,0.8);
 	border:none;
 	color:#fff;
@@ -61,7 +62,7 @@ header {
 section {
 	text-align:center;
 	margin:0px;
-	background-color: rgba(255,255,255,0.95);
+	background-color: rgba(240,240,240,0.95);
 	font-size:18px;
 }
 

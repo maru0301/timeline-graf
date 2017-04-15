@@ -1963,12 +1963,12 @@ class TimeLine {
 			ctx.textAlign = 'center';
 
 			ctx.beginPath();
-			ctx.fillStyle = 'rgb(0, 0, 255)'; // blue
+			ctx.fillStyle = 'rgb(20, 20, 180)'; // blue
 			var blue_width = target.width * per;
 			ctx.fillRect(0, 0, blue_width, target.height);
 
 			ctx.beginPath();
-			ctx.fillStyle = 'rgb(255, 0, 0)'; // red
+			ctx.fillStyle = 'rgb(180, 20, 20)'; // red
 			var red_width = target.width - blue_width;
 			ctx.fillRect(blue_width, 0, red_width, target.height);
 
