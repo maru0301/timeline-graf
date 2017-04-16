@@ -12,8 +12,7 @@ class RiotApi
 	{
 		$master_url = $url . $this->api_key;
 		$json = file_get_contents($master_url);
-		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
-		
+
 		return $json;
 	}
 	
@@ -66,7 +65,6 @@ class RiotApi
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "?gameHash=" . $gameHash;
 
 		$json = file_get_contents($url);
-		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 		
 		return $json;
 	}
@@ -80,7 +78,6 @@ class RiotApi
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "/timeline?gameHash=" . $gameHash;
 
 		$json = file_get_contents($url);
-		$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 		
 		return $json;
 	}

@@ -32,6 +32,10 @@ class TimeLine {
 		this.frame = 0;
 		this.isShow = false;
 		this.isEndFrame = false;
+
+		this.REGION_CODE = [ "BR1", "EUN1", "EUW1", "JP1", "KR", "LA1", "LA2", "NA1", "OC1", "TR1", "RU", "PBE1" ];
+		this.TEAM_NAME = [ "Blue", "Red" ];
+		this.isLiveSever = false;
 	}
 
 	GetMatchData(data)
@@ -60,6 +64,9 @@ class TimeLine {
 		var gameId = url.substr(0, index);
 		url = url.substr(index+1);
 		var gameHash = url;
+
+		// LiveServer
+		this.CheckLiveServer(gameRealm);
 
 		var request = [
 			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
@@ -216,8 +223,6 @@ class TimeLine {
 
 		$.when.apply(null, jqXHRList).done(function ()
 		{
-			console.log("Success : InitTimeLine");
-
 			var json = [];
 			var statuses = [];
 			var jqXHRResultList = [];
@@ -241,8 +246,8 @@ class TimeLine {
 					if(a.key > b.key) return 1;
 					if(a.key == b.key) return 0;
 			});
+
 			// ソート
-			
 			for(var key in itemImgJson.data)
 				itemImgImgData[key] = itemImgJson.data[key];
 			
@@ -460,7 +465,7 @@ class TimeLine {
 	{
 		var set_data = [];
 
-		for( var i = 0 ; i < 2 ; ++i )
+		for( var i = 0 ; i < data.teams.length ; ++i )
 		{
 			set_data[i] = {};
 			set_data[i] = this.SetTeamDataCommon(data.teams[i]);
@@ -506,7 +511,10 @@ class TimeLine {
 			var index = tag.search(" ");
 			tag = tag.substr(0, index);
 
-			set_data[i].team_name = tag;
+			if( this.isLiveSever )
+				set_data[i].team_name = this.TEAM_NAME[i];
+			else
+				set_data[i].team_name = tag;
 		}
 
 		return set_data;
@@ -1899,6 +1907,9 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
 		];
 
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle) )
+			isVisible = false;
+		
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
 	}
@@ -1910,6 +1921,9 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
 		];
 		
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle) )
+			isVisible = false;
+		
 		this.ShowBar($("#player > player"+ player_index +" > JungleCSEnemy > canvas")[0], num, isVisible);
 	}
 	
@@ -1920,6 +1934,9 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
 		];
 
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle) )
+			isVisible = false;
+		
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
 	}
@@ -1930,6 +1947,9 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
 		];
+		
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle) )
+			isVisible = false;
 		
 		this.ShowBar($("#player > player"+ player_index +" > JungleCSTeam > canvas")[0], num, isVisible);
 	}
@@ -2313,7 +2333,7 @@ class TimeLine {
 		];
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > JungleCS > " + this.TEAM_TAG[i]).html("JungleCS : " + num[i]);
+			$("#team > JungleCS > " + this.TEAM_TAG[i]).html( "JungleCS : " + num[i]);
 	}
 	
 	ShowTeamJungleCSBar(frame)
@@ -2354,6 +2374,9 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
 		];
 
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle) )
+			isVisible = false;
+
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
 	}
@@ -2365,15 +2388,21 @@ class TimeLine {
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
 		];
 		
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle) )
+			isVisible = false;
+
 		this.ShowBar($("#team > JungleCSEnemy > canvas")[0], num, isVisible);
 	}
 
 	ShowTeamJungleCSTeam(frame, isVisible)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
-			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle
 		];
+		
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle) )
+			isVisible = false;
 
 		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
@@ -2382,9 +2411,12 @@ class TimeLine {
 	ShowTeamJungleCSTeamBar(frame, isVisible)
 	{
 		var num = [
-			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
-			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
+			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle,
+			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle
 		];
+		
+		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle) )
+			isVisible = false;
 		
 		this.ShowBar($("#team > JungleCSTeam > canvas")[0], num, isVisible);
 	}
@@ -2412,7 +2444,7 @@ class TimeLine {
 		
 		var isEnd = self.isEndFrame;
 
-		document.getElementById("frame").innerHTML = "&nbsp;&nbsp;&nbsp;" + (isEnd ? "End Game" : frame + ":00");
+		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
 
 		self.ChangeParam(frame, isEnd);
 		self.ChangeBar(frame, isEnd);
@@ -2561,6 +2593,20 @@ class TimeLine {
 		var frame = this.frame;	
 
 		this.ChangeBar(frame,isEnd);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+
+	CheckLiveServer(region)
+	{
+		for( var i = 0 ; i < this.REGION_CODE.length ; ++i )
+		{
+			if( region.toUpperCase() == this.REGION_CODE[i] )
+			{
+				this.isLiveSever = true;
+				break;
+			}
+		}
 	}
 }
 
