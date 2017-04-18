@@ -1973,7 +1973,7 @@ class TimeLine {
 
 		if( isVisible )
 		{
-			target.width = $("body").width();
+			target.width = $("main").width();
 			target.height = 20;
 
 			ctx.save();
