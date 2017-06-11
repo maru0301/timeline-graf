@@ -157,6 +157,39 @@ class TimeLine {
 					}
 				}
 
+				// レーン情報が可笑しいjsonデータの場合は空いてるレーンに突っ込む
+				for( var i = 0 ; i < work.length ; ++i )
+				{
+					for( var j = 0 ; j < work[i].length ; ++j )
+					{
+						if(!work[i][j])
+						{
+							for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
+							{
+								var isSet = false;
+								for( var l = 0 ; l < work[i].length ; ++l )
+								{
+
+									if( work[i][l] )
+									{
+										if(matchDetailData.teams[i].player[k].participantId == work[i][l].participantId )
+										{
+											isSet = true;
+											break;
+										}
+									}
+								}
+
+								if(!isSet)
+								{
+									work[i][j] = matchDetailData.teams[i].player[k];
+									break;
+								}
+							}
+						}
+					}
+				}
+
 				for( var i = 0 ; i < work.length ; ++i )
 				{
 					matchDetailData.teams[i].player = work[i];
@@ -720,7 +753,6 @@ class TimeLine {
 			for( var k = 0 ; k < detailData.teams[j].player.length ; ++k, ++index )
 			{
 				var set_index = detailData.teams[j].player[k].participantId;
-				set_index = index;
 				this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player[set_index] = detailData.teams[j].player[k];
 			}
 		}
@@ -865,7 +897,11 @@ class TimeLine {
 							case "BLUE_TRINKET" :
 								set_work_frame.player[setId].wardPlaceTrinket++;
 								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								{
+									console.log("k: " + k);
+									console.log("setID: " + setId);
 									this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlaceTrinket++;
+								}
 								isPlace = true;
 								break;
 							default:
