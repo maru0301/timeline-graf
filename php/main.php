@@ -1,57 +1,60 @@
 <?php
 
+require_once('aws.phar');
+use Aws\S3\S3Client;
+use Aws\Common\Enum\Region;
+
 if( !isset( $_GET['func'] ) ) return;
 
 //-------------------------------------------------
 
 class RiotApi
 {
-	private $api_key = '';
-	
-	private function GetJson( $url )
+	private function GetS3File()
 	{
-		$master_url = $url . $this->api_key;
-		$json = file_get_contents($master_url);
+		$config = [
+			'version' => 'latest',
+			'region' => 'ap-northeast-1', // バケットのリージョン;
+			'credentials' => array(
+				'key'       => '',
+				'secret'    => '',
+			),
+		];
 
-		return $json;
+		$s3 = S3Client::factory($config);
+		$s3->registerStreamWrapper();
+		$bucket = "lol-staticdata";
+		$key = "Json";
+		$path = sprintf("s3://%s/%s", $bucket, $key);
+
+		return $path;
 	}
-	
+
 	public function GetRealm()
 	{
-		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/realms?api_key=');
+		$json = file_get_contents('../data/json/realms.json');
 		
 		return $json;
 	}
 	
 	public function GetChampionImage()
 	{
-		$version = $_GET['ver'];
-		
-		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/champions?champListData=image&version=' . $version . '&api_key=');
-		
-		return $json;
-	}
-	
-	public function GetSummonerSpells()
-	{
-		$version = $_GET['ver'];
-		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/summoner-spells?spellData=image&version=' . $version . '&api_key=');
-		
+		$path = $this->GetS3File();
+		$json = file_get_contents($path.'/champions.json');
+
 		return $json;
 	}
 	
 	public function GetItem()
 	{
-		$version = $_GET['ver'];
-		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/items?version=' . $version . '&itemListData=all&api_key=');
+		$json = file_get_contents('../data/json/items.json');
 		
 		return $json;
 	}
-	
-	public function GetMasteryImage()
+
+	public function GetVersion()
 	{
-		$version = $_GET['ver'];
-		$json = $this->GetJson('https://na1.api.riotgames.com/lol/static-data/v3/masteries?version=' . $version . '&masteryListData=image&api_key=');
+		$json = file_get_contents('../data/json/versions.json');
 		
 		return $json;
 	}
@@ -64,7 +67,13 @@ class RiotApi
 
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "?gameHash=" . $gameHash;
 
-		$json = file_get_contents($url);
+		$ctx = stream_context_create(array(
+			'http' => array(
+			'method' => 'GET',
+			'header' => 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko')
+			)
+		);
+		$json = file_get_contents($url, false, $ctx);
 		
 		return $json;
 	}
@@ -77,14 +86,14 @@ class RiotApi
 
 		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "/timeline?gameHash=" . $gameHash;
 
-		$json = file_get_contents($url);
-		
-		return $json;
-	}
-	
-	public function GetVersion()
-	{
-		$json = $this->GetJson('https://global.api.pvp.net/api/lol/static-data/JP/v1.2/versions?api_key=');
+		$ctx = stream_context_create(array(
+			'http' => array(
+			'method' => 'GET',
+			'header' => 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko')
+			)
+		);
+
+		$json = file_get_contents($url, false, $ctx);
 		
 		return $json;
 	}
@@ -97,12 +106,10 @@ $api = new RiotApi;
 $func_tbl = array(
 			"GetRealm" => "GetRealm",
 			"GetChampionImage" => "GetChampionImage",
-			"GetSummonerSpells" => "GetSummonerSpells",
 			"GetItem" => "GetItem",
-			"GetMasteryImage" => "GetMasteryImage",
+			"GetVersion" => "GetVersion",
 			"GetMatchDetails" => "GetMatchDetails",
 			"GetMatchTimeline" => "GetMatchTimeline",
-			"GetVersion" => "GetVersion",
 );
 
 //-------------------------------------------------

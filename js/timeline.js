@@ -17,7 +17,7 @@ class TimeLine {
 		this.ERROR_ID_MATCH_TIMELINE_GET_ERROR	= "タイムライン情報が取得出来ませんでした";
 
 		this.VERSION = "";
-		this.CDN_URL = "";
+		this.CDN_URL = "https://ddragon.leagueoflegends.com/cdn";
 
 		this.JSON_DATA_MATCHDETAIL = {};
 		this.JSON_DATA_TIMELINE = {};
@@ -235,41 +235,12 @@ class TimeLine {
 	InitDataJson(matchDetailData, matchTimelineJson)
 	{
 		var self = this;
-
-		var request = [
-			{ error_id: this.ERROR_ID_REALM_GET_ERROR,			url: './php/main.php', data: { func:"GetRealm" },  },
-			{ error_id: this.ERROR_ID_ITEM_IMG_GET_ERROR,		url: './php/main.php', data: { func:"GetItem", ver:this.VERSION },  },
-		];
-
-		var jqXHRList = [];
-
-		for( var i = 0, max = request.length ; i < max ; ++i )
-		{
-			jqXHRList.push($.ajax(
-			{
-				url: request[i].url,
-				type: 'GET',
-				dataType: 'json',
-				data: request[i].data,
-			}));
-		}
-
-		$.when.apply(null, jqXHRList).done(function ()
-		{
-			var json = [];
-			var statuses = [];
-			var jqXHRResultList = [];
-			
-			for( var i = 0, max = arguments.length ; i < max ; ++i )
-			{
-				var result = arguments[i];
-				json.push(result[0]);
-				statuses.push(result[1]);
-				jqXHRResultList.push(result[3]);
-			}
-
-			var realmJson = json[0];
-			var itemImgJson = json[1];
+		$.ajax({
+			url: './php/main.php',
+			data: { func:"GetItem" }
+		  }).done(function(json)
+		  {
+			var itemImgJson = json;
 
 			var itemImgImgData = new Array();
 			
@@ -304,8 +275,6 @@ class TimeLine {
 
 			}
 
-			self.CDN_URL = realmJson.cdn;
-
 			self.SetTimiLineFrameData(self.JSON_DATA_MATCHDETAIL);
 
 			var id = [];
@@ -337,21 +306,11 @@ class TimeLine {
 			self.InitPlayer();
 			self.InitTimeLineSlideBar();
 			self.Show();
-		});
 
-		$.when.apply(null, jqXHRList).fail(function ()
-		{
-			console.log("Fail : InitTimeLine");
-			console.log(jqXHRList);
-
-			for( var i = 0 ; i < jqXHRList.length ; ++i )
-			{
-				if( jqXHRList[i].statusText === "error" )
-				{
-					console.log(request[i].error_id);
-				}
-			}
-		});
+		  }).fail(function()
+		  {
+			  console.log("error");
+		  });
 	}
 	
 	InitTeam()
@@ -435,20 +394,20 @@ class TimeLine {
 			{	name:"Kill",				isCanvas:true	},
 			{	name:"Death",				isCanvas:true	},
 			{	name:"Assist",				isCanvas:true	},
-			//{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
-			//{	name:"PhysicalDamageDealtToPlayer",			isCanvas:true	},
-			//{	name:"MagicDamageDealtToChampion",			isCanvas:true	},
-			//{	name:"MagicDamageDealtToPlayer",			isCanvas:true	},
-			//{	name:"TrueDamageDealtToChampion",			isCanvas:true	},
-			//{	name:"TrueDamageDealtToPlayer",				isCanvas:true	},
-			//{	name:"TotalDamageDealt",					isCanvas:true	},
-			//{	name:"TotalDamageDealtToBuilding",			isCanvas:true	},
+			{	name:"PhysicalDamageDealtToChampion",		isCanvas:true	},
+			{	name:"PhysicalDamageDealtToPlayer",			isCanvas:true	},
+			{	name:"MagicDamageDealtToChampion",			isCanvas:true	},
+			{	name:"MagicDamageDealtToPlayer",			isCanvas:true	},
+			{	name:"TrueDamageDealtToChampion",			isCanvas:true	},
+			{	name:"TrueDamageDealtToPlayer",				isCanvas:true	},
+			{	name:"TotalDamageDealt",					isCanvas:true	},
+			{	name:"TotalDamageDealtToBuilding",			isCanvas:true	},
 			{	name:"TotalDamageDealtToChampion",			isCanvas:true	},
 			{	name:"TotalCrawdControlDamageDealt",		isCanvas:true	},
 			{	name:"TotalDamageTaken",					isCanvas:true	},
-			//{	name:"PhysicalDamageTaken",					isCanvas:true	},
-			//{	name:"MagicDamageTaken",					isCanvas:true	},
-			//{	name:"TrueDamageTaken",						isCanvas:true	},
+			{	name:"PhysicalDamageTaken",					isCanvas:true	},
+			{	name:"MagicDamageTaken",					isCanvas:true	},
+			{	name:"TrueDamageTaken",						isCanvas:true	},
 			{	name:"TotalHeal",							isCanvas:true	},
 			{	name:"TotalHealToUnit",						isCanvas:true	},
 		];
@@ -639,22 +598,22 @@ class TimeLine {
 				set_data[index].wardKill = data.participants[i].stats.wardsKilled || 0;
 				set_data[index].wardPlace = data.participants[i].stats.wardsPlaced || 0;
 				// 与えたダメージ
-				//set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
-				//set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
-				//set_data[index].magicDamageDealtToChampions = data.participants[i].stats.magicDamageDealtToChampions || 0; // 与えたメージ量(魔法)
-				//set_data[index].magicDamageDealtPlayer = data.participants[i].stats.magicDamageDealtPlayer || 0;
-				//set_data[index].trueDamageDealtToChampions = data.participants[i].stats.trueDamageDealtToChampions || 0; // 与えたメージ量(確定ダメージ)
-				//set_data[index].trueDamageDealtToPlayer = data.participants[i].stats.trueDamageDealtPlayer || 0;
+				set_data[index].physicalDamageDealtToChampions = data.participants[i].stats.physicalDamageDealtToChampions || 0; // 与えたメージ量(物理)
+				set_data[index].physicalDamageDealtPlayer = data.participants[i].stats.physicalDamageDealtPlayer || 0;
+				set_data[index].magicDamageDealtToChampions = data.participants[i].stats.magicDamageDealtToChampions || 0; // 与えたメージ量(魔法)
+				set_data[index].magicDamageDealtPlayer = data.participants[i].stats.magicDamageDealtPlayer || 0;
+				set_data[index].trueDamageDealtToChampions = data.participants[i].stats.trueDamageDealtToChampions || 0; // 与えたメージ量(確定ダメージ)
+				set_data[index].trueDamageDealtToPlayer = data.participants[i].stats.trueDamageDealtPlayer || 0;
 				set_data[index].totalTimeCrowdControlDealt = data.participants[i].stats.totalTimeCrowdControlDealt || 0;
-				// set_data[index].largestCriticalStrike = data.participants[i].stats.largestCriticalStrike || 0; // 最大クリティカルダメージ
+				 set_data[index].largestCriticalStrike = data.participants[i].stats.largestCriticalStrike || 0; // 最大クリティカルダメージ
 				
 				set_data[index].totalDamageDealt = data.participants[i].stats.totalDamageDealt || 0; // 与えたダメージ量(全ダメージ)
-				//set_data[index].totalDamageDealtToBuildings = data.participants[i].stats.totalDamageDealtToBuildings || 0;
+				set_data[index].totalDamageDealtToBuildings = data.participants[i].stats.totalDamageDealtToBuildings || 0;
 				set_data[index].totalDamageDealtToChampions = data.participants[i].stats.totalDamageDealtToChampions || 0;
 				// 受けたダメージ
-				//set_data[index].physicalDamageTaken = data.participants[i].stats.physicalDamageTaken || 0;
-				//set_data[index].magicDamageTaken = data.participants[i].stats.magicDamageTaken || 0;
-				//set_data[index].trueDamageTaken = data.participants[i].stats.trueDamageTaken || 0;
+				set_data[index].physicalDamageTaken = data.participants[i].stats.physicalDamageTaken || 0;
+				set_data[index].magicDamageTaken = data.participants[i].stats.magicDamageTaken || 0;
+				set_data[index].trueDamageTaken = data.participants[i].stats.trueDamageTaken || 0;
 				set_data[index].totalDamageTaken = data.participants[i].stats.totalDamageTaken || 0;
 				// 回復
 				set_data[index].totalHeal = data.participants[i].stats.totalHeal || 0; // 合計回復量
@@ -898,8 +857,8 @@ class TimeLine {
 								set_work_frame.player[setId].wardPlaceTrinket++;
 								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 								{
-									console.log("k: " + k);
-									console.log("setID: " + setId);
+//									console.log("k: " + k);
+//									console.log("setID: " + setId);
 									this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlaceTrinket++;
 								}
 								isPlace = true;
@@ -1096,7 +1055,7 @@ class TimeLine {
 		{
 			for( var j = 0 ; j < this.JSON_DATA_CHAMP_IMG.length ; ++j )
 			{
-				if(this.JSON_DATA_CHAMP_IMG[j].id == this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].championId)
+				if(this.JSON_DATA_CHAMP_IMG[j].key == this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].championId)
 				{
 					champ_index = j;
 					break;
@@ -1305,7 +1264,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > Gold > canvas")[0], num);
 	}
-	/*
+	
 	ShowPhysicalDamageDealtToChampion(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1472,8 +1431,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > TotalDamageDealtToBuilding > canvas")[0], num, isVisible);
 	}
-	*/
-
+	
 	ShowTotalDamageDealtToChampion(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1536,7 +1494,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > TotalDamageTaken > canvas")[0], num, isVisible);
 	}
-	/*
+	
 	ShowPhysicalDamageTaken(player_index, frame, isVisible)
 	{
 		var num = [
@@ -1599,7 +1557,7 @@ class TimeLine {
 		
 		this.ShowBar($("#player > player"+ player_index +" > TrueDamageTaken > canvas")[0], num, isVisible);
 	}
-	*/
+	
 	ShowTotalHeal(player_index, frame, isVisible)
 	{
 		var num = [
@@ -2519,19 +2477,19 @@ class TimeLine {
 			this.ShowKill(player_index, frame);
 			this.ShowDeath(player_index, frame);
 			this.ShowAssist(player_index, frame);
-			//this.ShowPhysicalDamageDealtToChampion(player_index, frame, isEnd);
-			//this.ShowPhysicalDamageDealtToPlayer(player_index, frame, isEnd);
-			//this.ShowMagicDamageDealtToChampion(player_index, frame, isEnd);
-			//this.ShowMagicDamageDealtToPlayer(player_index, frame, isEnd);
-			//this.ShowTrueDamageDealtToChampion(player_index, frame, isEnd);
-			//this.ShowTrueDamageDealtToPlayer(player_index, frame, isEnd);
-			//this.ShowTotalDamageDealt(player_index, frame, isEnd);
-			//this.ShowTotalDamageDealtToBuilding(player_index, frame, isEnd);
+			this.ShowPhysicalDamageDealtToChampion(player_index, frame, isEnd);
+			this.ShowPhysicalDamageDealtToPlayer(player_index, frame, isEnd);
+			this.ShowMagicDamageDealtToChampion(player_index, frame, isEnd);
+			this.ShowMagicDamageDealtToPlayer(player_index, frame, isEnd);
+			this.ShowTrueDamageDealtToChampion(player_index, frame, isEnd);
+			this.ShowTrueDamageDealtToPlayer(player_index, frame, isEnd);
+			this.ShowTotalDamageDealt(player_index, frame, isEnd);
+			this.ShowTotalDamageDealtToBuilding(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampion(player_index, frame, isEnd);
 			this.ShowTotalCrawdControlDamageDealt(player_index, frame, isEnd);
-			//this.ShowPhysicalDamageTaken(player_index, frame, isEnd);
-			//this.ShowMagicDamageTaken(player_index, frame, isEnd);
-			//this.ShowTrueDamageTaken(player_index, frame, isEnd);
+			this.ShowPhysicalDamageTaken(player_index, frame, isEnd);
+			this.ShowMagicDamageTaken(player_index, frame, isEnd);
+			this.ShowTrueDamageTaken(player_index, frame, isEnd);
 			this.ShowTotalDamageTaken(player_index, frame, isEnd);
 			this.ShowTotalHeal(player_index, frame, isEnd);
 			this.ShowTotalHealToUnit(player_index, frame, isEnd);
@@ -2585,19 +2543,19 @@ class TimeLine {
 			this.ShowKillBar(player_index, frame);
 			this.ShowDeathBar(player_index, frame);
 			this.ShowAssistBar(player_index, frame);
-			//this.ShowPhysicalDamageDealtToChampionBar(player_index, frame, isEnd);
-			//this.ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isEnd);
-			//this.ShowMagicDamageDealtToChampionBar(player_index, frame, isEnd);
-			//this.ShowMagicDamageDealtToPlayerBar(player_index, frame, isEnd);
-			//this.ShowTrueDamageDealtToChampionBar(player_index, frame, isEnd);
-			//this.ShowTrueDamageDealtToPlayerBar(player_index, frame, isEnd);
-			//this.ShowTotalDamageDealtBar(player_index, frame, isEnd);
-			//this.ShowTotalDamageDealtToBuildingBar(player_index, frame, isEnd);
+			this.ShowPhysicalDamageDealtToChampionBar(player_index, frame, isEnd);
+			this.ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isEnd);
+			this.ShowMagicDamageDealtToChampionBar(player_index, frame, isEnd);
+			this.ShowMagicDamageDealtToPlayerBar(player_index, frame, isEnd);
+			this.ShowTrueDamageDealtToChampionBar(player_index, frame, isEnd);
+			this.ShowTrueDamageDealtToPlayerBar(player_index, frame, isEnd);
+			this.ShowTotalDamageDealtBar(player_index, frame, isEnd);
+			this.ShowTotalDamageDealtToBuildingBar(player_index, frame, isEnd);
 			this.ShowTotalDamageDealtToChampionBar(player_index, frame, isEnd);
 			this.ShowTotalCrawdControlDamageDealtBar(player_index, frame, isEnd);
-			//this.ShowPhysicalDamageTakenBar(player_index, frame, isEnd);
-			//this.ShowMagicDamageTakenBar(player_index, frame, isEnd);
-			//this.ShowTrueDamageTakenBar(player_index, frame, isEnd);
+			this.ShowPhysicalDamageTakenBar(player_index, frame, isEnd);
+			this.ShowMagicDamageTakenBar(player_index, frame, isEnd);
+			this.ShowTrueDamageTakenBar(player_index, frame, isEnd);
 			this.ShowTotalDamageTakenBar(player_index, frame, isEnd);
 			this.ShowTotalHealBar(player_index, frame, isEnd);
 			this.ShowTotalHealToUnitBar(player_index, frame, isEnd);
