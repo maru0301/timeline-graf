@@ -10,11 +10,17 @@ if( !isset( $_GET['func'] ) ) return;
 
 class RiotApi
 {
-	private function GetS3File()
+	//-------------------------------------------------
+
+	const ACS_URL = 'https://acs.leagueoflegends.com/v1/stats/game/';
+	
+	//-------------------------------------------------
+
+	private function GetS3Path()
 	{
 		$config = [
 			'version' => 'latest',
-			'region' => 'ap-northeast-1', // バケットのリージョン;
+			'region' => '',
 			'credentials' => array(
 				'key'       => '',
 				'secret'    => '',
@@ -30,16 +36,25 @@ class RiotApi
 		return $path;
 	}
 
-	public function GetRealm()
+	private function GetFileGetCtx($url)
 	{
-		$json = file_get_contents('../data/json/realms.json');
-		
+		$ctx = stream_context_create(array(
+			'http' => array(
+			'method' => 'GET',
+			'header' => 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko')
+			)
+		);
+
+		$json = file_get_contents($url, false, $ctx);
+
 		return $json;
 	}
-	
-	public function GetChampionImage()
+
+	//-------------------------------------------------
+
+	public function GetChampions()
 	{
-		$path = $this->GetS3File();
+		$path = self::GetS3Path();
 		$json = file_get_contents($path.'/champions.json');
 
 		return $json;
@@ -47,14 +62,16 @@ class RiotApi
 	
 	public function GetItem()
 	{
-		$json = file_get_contents('../data/json/items.json');
+		$path = self::GetS3Path();
+		$json = file_get_contents($path.'/items.json');
 		
 		return $json;
 	}
 
 	public function GetVersion()
 	{
-		$json = file_get_contents('../data/json/versions.json');
+		$path = self::GetS3Path();
+		$json = file_get_contents($path.'/versions.json');
 		
 		return $json;
 	}
@@ -65,15 +82,8 @@ class RiotApi
 		$gameId = $_GET['id'];
 		$gameHash = $_GET['hash'];
 
-		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "?gameHash=" . $gameHash;
-
-		$ctx = stream_context_create(array(
-			'http' => array(
-			'method' => 'GET',
-			'header' => 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko')
-			)
-		);
-		$json = file_get_contents($url, false, $ctx);
+		$url = self::ACS_URL . $gameRealm . "/" . $gameId . "?gameHash=" . $gameHash;
+		$json = self::GetFileGetCtx($url);
 		
 		return $json;
 	}
@@ -84,17 +94,9 @@ class RiotApi
 		$gameId = $_GET['id'];
 		$gameHash = $_GET['hash'];
 
-		$url = "https://acs.leagueoflegends.com/v1/stats/game/" . $gameRealm . "/" . $gameId . "/timeline?gameHash=" . $gameHash;
+		$url = self::ACS_URL . $gameRealm . "/" . $gameId . "/timeline?gameHash=" . $gameHash;
+		$json = self::GetFileGetCtx($url);
 
-		$ctx = stream_context_create(array(
-			'http' => array(
-			'method' => 'GET',
-			'header' => 'User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; Touch; rv:11.0) like Gecko')
-			)
-		);
-
-		$json = file_get_contents($url, false, $ctx);
-		
 		return $json;
 	}
 }
@@ -104,8 +106,7 @@ class RiotApi
 $api = new RiotApi;
 
 $func_tbl = array(
-			"GetRealm" => "GetRealm",
-			"GetChampionImage" => "GetChampionImage",
+			"GetChampions" => "GetChampions",
 			"GetItem" => "GetItem",
 			"GetVersion" => "GetVersion",
 			"GetMatchDetails" => "GetMatchDetails",

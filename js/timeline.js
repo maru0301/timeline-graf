@@ -40,7 +40,7 @@ class TimeLine {
 
 	GetMatchData(data)
 	{
-		var set_data = {};
+		let set_data = {};
 
 		set_data.gameVer = data.gameVersion;
 		set_data.gameMode = data.gameMode;
@@ -53,31 +53,31 @@ class TimeLine {
 	{
 		var self = this;
 
-		var data = href_url.split("?")[1];
-		var text = data.split("=")[1];
-		var url = decodeURIComponent(text);
+		let data = href_url.split("?")[1];
+		let text = data.split("=")[1];
+		let url = decodeURIComponent(text);
 
-		var index = url.search("&");
-		var gameRealm = url.substr(0, index);
+		let index = url.search("&");
+		let gameRealm = url.substr(0, index);
 		url = url.substr(index+1);
 		index = url.search("&");
-		var gameId = url.substr(0, index);
+		let gameId = url.substr(0, index);
 		url = url.substr(index+1);
-		var gameHash = url;
+		let gameHash = url;
 
 		// LiveServer
 		this.CheckLiveServer(gameRealm);
 
-		var request = [
+		const request = [
 			{ error_id: this.ERROR_ID_MATCH_DETAILS_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchDetails", realm:gameRealm, id:gameId, hash:gameHash },  },
 			{ error_id: this.ERROR_ID_MATCH_TIMELINE_GET_ERROR,	url: './php/main.php', data: { func:"GetMatchTimeline", realm:gameRealm, id:gameId, hash:gameHash },  },
 			{ error_id: this.ERROR_ID_VERSION_GET_ERROR,		url: './php/main.php', data: { func:"GetVersion" },  },
-			{ error_id: this.ERROR_ID_CHAMPION_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetChampionImage", ver:this.VERSION },  },
+			{ error_id: this.ERROR_ID_CHAMPION_IMG_GET_ERROR,	url: './php/main.php', data: { func:"GetChampions" },  },
 		];
 
-		var jqXHRList = [];
+		let jqXHRList = [];
 
-		for( var i = 0, max = request.length ; i < max ; ++i )
+		for( let i = 0, max = request.length ; i < max ; ++i )
 		{
 			jqXHRList.push($.ajax(
 			{
@@ -90,33 +90,33 @@ class TimeLine {
 
 		$.when.apply(null, jqXHRList).done(function ()
 		{
-			var json = [];
-			var statuses = [];
-			var jqXHRResultList = [];
+			let json = [];
+			let statuses = [];
+			let jqXHRResultList = [];
 			
-			for( var i = 0, max = arguments.length ; i < max ; ++i )
+			for( let i = 0, max = arguments.length ; i < max ; ++i )
 			{
-				var result = arguments[i];
+				const result = arguments[i];
 				json.push(result[0]);
 				statuses.push(result[1]);
 				jqXHRResultList.push(result[3]);
 			}
 
-			var matchDetailJson = json[0];
+			const matchDetailJson = json[0];
 			self.JSON_DATA_TIMELINE = json[1];
-			var versionJson = json[2];
-			var champImgJson = json[3];
+			const versionJson = json[2];
+			const champImgJson = json[3];
 
-			var championImgData = new Array();
+			let championImgData = new Array();
 
-			for(var key in champImgJson.data)
+			for(let key in champImgJson.data)
 				self.JSON_DATA_CHAMP_IMG.push(champImgJson.data[key]);
 
-			var matchDetailData = { game:{}, teams:[] };
+			let matchDetailData = { game:{}, teams:[] };
 			matchDetailData.game = self.GetMatchData(matchDetailJson);
 			matchDetailData.teams = self.GetTeamData(matchDetailJson);
 			
-			var isSort = false;
+			let isSort = false;
 
 			switch(matchDetailData.game.gameMode)
 			{
@@ -128,16 +128,16 @@ class TimeLine {
 
 			if(isSort)
 			{
-				var lane = ["TOP","JUNGLE","MIDDLE","BOTTOM", "BOTTOM"];
-				var sub = ["DUO_CARRY", "DUO_SUPPORT"];
-				var work = [];
+				const lane = ["TOP","JUNGLE","MIDDLE","BOTTOM", "BOTTOM"];
+				const sub = ["DUO_CARRY", "DUO_SUPPORT"];
+				let work = [];
 
-				for( var i = 0 ; i < matchDetailData.teams.length ; ++i )
+				for( let i = 0 ; i < matchDetailData.teams.length ; ++i )
 				{
 					work[i] = [];
-					for( var j = 0, sub_index = 0 ; j < lane.length ; ++j )
+					for( let j = 0, sub_index = 0 ; j < lane.length ; ++j )
 					{
-						for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
+						for( let k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
 						{
 							if( lane[j] == matchDetailData.teams[i].player[k].lane )
 							{
@@ -158,16 +158,16 @@ class TimeLine {
 				}
 
 				// レーン情報が可笑しいjsonデータの場合は空いてるレーンに突っ込む
-				for( var i = 0 ; i < work.length ; ++i )
+				for( let i = 0 ; i < work.length ; ++i )
 				{
-					for( var j = 0 ; j < work[i].length ; ++j )
+					for( let j = 0 ; j < work[i].length ; ++j )
 					{
 						if(!work[i][j])
 						{
-							for( var k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
+							for( let k = 0 ; k < matchDetailData.teams[i].player.length ; ++k )
 							{
-								var isSet = false;
-								for( var l = 0 ; l < work[i].length ; ++l )
+								let isSet = false;
+								for( let l = 0 ; l < work[i].length ; ++l )
 								{
 
 									if( work[i][l] )
@@ -190,7 +190,7 @@ class TimeLine {
 					}
 				}
 
-				for( var i = 0 ; i < work.length ; ++i )
+				for( let i = 0 ; i < work.length ; ++i )
 				{
 					matchDetailData.teams[i].player = work[i];
 				}
@@ -198,7 +198,7 @@ class TimeLine {
 			
 			self.JSON_DATA_MATCHDETAIL = matchDetailData;
 			
-			for( var i in self.JSON_DATA_TIMELINE.frames )
+			for( let i in self.JSON_DATA_TIMELINE.frames )
 			{
 				self.JSON_DATA_TIMELINE.frames[i].events = self.JSON_DATA_TIMELINE.frames[i].events.filter(function(a){
 					switch (a.type)
@@ -222,7 +222,7 @@ class TimeLine {
 			console.log("Fail : Main");
 			console.log(jqXHRList);
 
-			for( var i = 0 ; i < jqXHRList.length ; ++i )
+			for( let i = 0 ; i < jqXHRList.length ; ++i )
 			{
 				if( jqXHRList[i].statusText === "error" )
 				{
@@ -234,15 +234,15 @@ class TimeLine {
 
 	InitDataJson(matchDetailData, matchTimelineJson)
 	{
-		var self = this;
+		let self = this;
 		$.ajax({
 			url: './php/main.php',
 			data: { func:"GetItem" }
 		  }).done(function(json)
 		  {
-			var itemImgJson = json;
+			const itemImgJson = json;
 
-			var itemImgImgData = new Array();
+			let itemImgImgData = new Array();
 			
 			self.JSON_DATA_CHAMP_IMG.sort(function(a, b)
 			{
@@ -252,11 +252,11 @@ class TimeLine {
 			});
 
 			// ソート
-			for(var key in itemImgJson.data)
+			for(let key in itemImgJson.data)
 				itemImgImgData[key] = itemImgJson.data[key];
 			
-			var isSet = false;
-			for(var key in itemImgImgData )
+			let isSet = false;
+			for(let key in itemImgImgData )
 			{
 				if( !itemImgImgData[key].name )
 					continue;
@@ -277,22 +277,22 @@ class TimeLine {
 
 			self.SetTimiLineFrameData(self.JSON_DATA_MATCHDETAIL);
 
-			var id = [];
+			let id = [];
 
-			for(var i = 0 ; i < self.JSON_DATA_MATCHDETAIL.teams.length ; ++i)
+			for(let i = 0 ; i < self.JSON_DATA_MATCHDETAIL.teams.length ; ++i)
 			{
-				for(var j = 0 ; j < self.JSON_DATA_MATCHDETAIL.teams[i].player.length ; ++j)
+				for(let j = 0 ; j < self.JSON_DATA_MATCHDETAIL.teams[i].player.length ; ++j)
 				{
 					id.push(self.JSON_DATA_MATCHDETAIL.teams[i].player[j].participantId);
 				}
 			}
 
-			var data = new Array();
-			for(var i = 0 ; i < self.TIMELINE_WORK_DATA.frame.length ; ++i)
+			let data = new Array();
+			for(let i = 0 ; i < self.TIMELINE_WORK_DATA.frame.length ; ++i)
 			{
-				for(var j = 0 ; j < id.length ; ++j)
+				for(let j = 0 ; j < id.length ; ++j)
 				{
-					for(var k in self.TIMELINE_WORK_DATA.frame[i].player)
+					for(let k in self.TIMELINE_WORK_DATA.frame[i].player)
 					{
 						if( id[j] == self.TIMELINE_WORK_DATA.frame[i].player[k].participantId )
 							data[j+1] = self.TIMELINE_WORK_DATA.frame[i].player[k];
@@ -315,9 +315,9 @@ class TimeLine {
 	
 	InitTeam()
 	{
-		var newTag, target;
+		let newTag, target;
 
-		var new_tag_name = [
+		const new_tag_name = [
 			{	name:"WinLose", 		isCanvas:false	},
 			{	name:"Name", 			isCanvas:false	},
 			{	name:"Kill",			isCanvas:true	},
@@ -339,14 +339,14 @@ class TimeLine {
 			{	name:"BuyVisionWard",	isCanvas:true	},
 		];
 
-		for( var i = 0 ; i < new_tag_name.length ; ++i )
+		for( let i = 0 ; i < new_tag_name.length ; ++i )
 		{
 			target = document.getElementById("team");
 			newTag = document.createElement(new_tag_name[i].name);
 			target.appendChild(newTag);
 			target = newTag;
 			
-			for( var j = 0 ; j < this.TEAM_TAG.length ; ++j )
+			for( let j = 0 ; j < this.TEAM_TAG.length ; ++j )
 			{
 				newTag = document.createElement(this.TEAM_TAG[j]);
 				newTag.className = this.TEAM_TAG[j];
@@ -363,10 +363,10 @@ class TimeLine {
 
 	InitPlayer()
 	{
-		var newTag, target;
-		var player_target;
+		let newTag, target;
+		let player_target;
 
-		var new_tag_name = [
+		const new_tag_name = [
 			{	name:"champion_img",		isCanvas:false	},
 			{	name:"Name", 				isCanvas:false	},
 			{	name:"Lv",					isCanvas:true	},
@@ -412,19 +412,19 @@ class TimeLine {
 			{	name:"TotalHealToUnit",						isCanvas:true	},
 		];
 		
-		for( var i = 1 ; i <= 5 ; ++i )
+		for( let i = 1 ; i <= 5 ; ++i )
 		{
 			target = document.getElementById("player");
 			newTag = document.createElement("player"+i);
 			target.appendChild(newTag);
 			player_target = newTag;
-			for( var j = 0 ; j < new_tag_name.length ; ++j )
+			for( let j = 0 ; j < new_tag_name.length ; ++j )
 			{
 				newTag = document.createElement(new_tag_name[j].name);
 				player_target.appendChild(newTag);
 				target = newTag;
 
-				for( var k = 0 ; k < this.TEAM_TAG.length ; ++k )
+				for( let k = 0 ; k < this.TEAM_TAG.length ; ++k )
 				{
 					newTag = document.createElement(this.TEAM_TAG[k]);
 					newTag.className = this.TEAM_TAG[k];
@@ -444,9 +444,9 @@ class TimeLine {
 
 	InitTimeLineSlideBar()
 	{
-		var target = document.getElementById("slidebar");
-		var max = this.JSON_DATA_TIMELINE.frames.length;
-		var self = this;
+		let target = document.getElementById("slidebar");
+		const max = this.JSON_DATA_TIMELINE.frames.length;
+		let self = this;
 		target.innerHTML = "<span id ='frame'></span><br><input type='range' id='frame_slidebar' min='0' max='"+ max +"' step='1' value='" + max + "'>";
 		$("#frame_slidebar").change(self, self.ChangeFrame);
 	}
@@ -455,9 +455,9 @@ class TimeLine {
 	
 	GetTeamData(data)
 	{
-		var set_data = [];
+		let set_data = [];
 
-		for( var i = 0 ; i < data.teams.length ; ++i )
+		for( let i = 0 ; i < data.teams.length ; ++i )
 		{
 			set_data[i] = {};
 			set_data[i] = this.SetTeamDataCommon(data.teams[i]);
@@ -483,7 +483,7 @@ class TimeLine {
 			set_data[i].wardKillTrinket = 0;
 			set_data[i].buyVisionWard = 0;
 			
-			for( var j = 0 ; j < set_data[i].player.length ; ++j )
+			for( let j = 0 ; j < set_data[i].player.length ; ++j )
 			{
 				set_data[i].kill += set_data[i].player[j].kill;
 				set_data[i].death += set_data[i].player[j].death;
@@ -499,8 +499,8 @@ class TimeLine {
 				set_data[i].buyVisionWard += set_data[i].player[j].buyVisionWard;
 			}
 
-			var tag = set_data[i].player[0].name;
-			var index = tag.search(" ");
+			let tag = set_data[i].player[0].name;
+			const index = tag.search(" ");
 			tag = tag.substr(0, index);
 
 			if( this.isLiveSever )
@@ -514,7 +514,7 @@ class TimeLine {
 
 	SetTeamDataCommon(data)
 	{
-		var set_data = {};
+		let set_data = {};
 
 		set_data.turretsKill = data.towerKills;
 		set_data.dragonKill = data.dragonKills;
@@ -530,9 +530,9 @@ class TimeLine {
 
 	GetPlayerData(data, teamId)
 	{
-		var set_data = [];
+		let set_data = [];
 
-		for( var i = 0, index = 0 ; i < data.participants.length ; ++i)
+		for( let i = 0, index = 0 ; i < data.participants.length ; ++i)
 		{
 			if( teamId == data.participants[i].teamId )
 			{
@@ -568,7 +568,7 @@ class TimeLine {
 				set_data[index].lane = data.participants[i].timeline.lane;
 				set_data[index].sub_lane = data.participants[i].timeline.role;
 
-				for( var j = 0 ; j < data.participantIdentities.length ; ++j )
+				for( let j = 0 ; j < data.participantIdentities.length ; ++j )
 				{
 					if( set_data[index].participantId == data.participantIdentities[j].participantId )
 					{
@@ -589,7 +589,7 @@ class TimeLine {
 
 				if( data.participants[i].masteries != undefined )
 				{
-					for( var j = 0 ; j < data.participants[i].masteries.length ; ++j )
+					for( let j = 0 ; j < data.participants[i].masteries.length ; ++j )
 						set_data[index].mastery[j] = data.participants[i].masteries[j].masteryId;
 				}
 
@@ -643,13 +643,13 @@ class TimeLine {
 	{
 		this.TIMELINE_WORK_DATA.frame = [];
 
-		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		for( let i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
 		{
 			this.TIMELINE_WORK_DATA.frame[i] = {};
 			this.TIMELINE_WORK_DATA.frame[i].player = {};
 			this.TIMELINE_WORK_DATA.frame[i].team = [ {}, {} ];
 
-			for( var j = 0 ; j < this.TIMELINE_WORK_DATA.frame[i].team.length ; ++j )
+			for( let j = 0 ; j < this.TIMELINE_WORK_DATA.frame[i].team.length ; ++j )
 			{
 				this.TIMELINE_WORK_DATA.frame[i].team[j].gold = 0;
 				this.TIMELINE_WORK_DATA.frame[i].team[j].cs = 0;
@@ -674,7 +674,7 @@ class TimeLine {
 				this.TIMELINE_WORK_DATA.frame[i].team[j].inhibitorKill = 0;
 			}
 
-			for( var j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
+			for( let j in this.JSON_DATA_TIMELINE.frames[i].participantFrames )
 			{
 				this.TIMELINE_WORK_DATA.frame[i].player[j] = {};
 				this.TIMELINE_WORK_DATA.frame[i].player[j].participantId = this.JSON_DATA_TIMELINE.frames[i].participantFrames[j].participantId;
@@ -707,11 +707,11 @@ class TimeLine {
 		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length] = {};
 		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player = [];
 
-		for( var j = 0, index = 1 ; j < detailData.teams.length ; ++j )
+		for( let j = 0, index = 1 ; j < detailData.teams.length ; ++j )
 		{
-			for( var k = 0 ; k < detailData.teams[j].player.length ; ++k, ++index )
+			for( let k = 0 ; k < detailData.teams[j].player.length ; ++k, ++index )
 			{
-				var set_index = detailData.teams[j].player[k].participantId;
+				const set_index = detailData.teams[j].player[k].participantId;
 				this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].player[set_index] = detailData.teams[j].player[k];
 			}
 		}
@@ -719,12 +719,13 @@ class TimeLine {
 		this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team = $.extend(true, {}, detailData.teams);
 		delete this.TIMELINE_WORK_DATA.frame[this.JSON_DATA_TIMELINE.frames.length].team["player"];
 
-		for( var i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
+		for( let i = 0 ; i < this.JSON_DATA_TIMELINE.frames.length ; ++i )
 		{
-			for( var j = 0 ; j < this.JSON_DATA_TIMELINE.frames[i].events.length ; ++j )
+			for( let j = 0 ; j < this.JSON_DATA_TIMELINE.frames[i].events.length ; ++j )
 			{
-				var isEnd = i == (this.JSON_DATA_TIMELINE.frames.length-1);
-				var set_work_frame = this.TIMELINE_WORK_DATA.frame[i+1];
+				const isEnd = i == (this.JSON_DATA_TIMELINE.frames.length-1);
+				let set_work_frame = this.TIMELINE_WORK_DATA.frame[i+1];
+				let killerId, setId;
 
 				switch(this.JSON_DATA_TIMELINE.frames[i].events[j].type)
 				{
@@ -732,26 +733,26 @@ class TimeLine {
 						if(isEnd)
 							break;
 						
-						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
-						var deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
-						var assistId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
+						killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+						const deathId = this.JSON_DATA_TIMELINE.frames[i].events[j].victimId;
+						const assistId = this.JSON_DATA_TIMELINE.frames[i].events[j].assistingParticipantIds;
 						
 						if(killerId != 0)
 							set_work_frame.player[killerId].kill++;
 						
 						set_work_frame.player[deathId].death++;
 
-						for( var k = 0 ; k < assistId.length ; ++k )
+						for( let k = 0 ; k < assistId.length ; ++k )
 							set_work_frame.player[assistId[k]].assist++;
 
-						for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+						for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 						{
 							if(killerId != 0)
 								this.TIMELINE_WORK_DATA.frame[k].player[killerId].kill++;
 							
 							this.TIMELINE_WORK_DATA.frame[k].player[deathId].death++;
 							
-							for( var l = 0 ; l < assistId.length ; ++l )
+							for( let l = 0 ; l < assistId.length ; ++l )
 								this.TIMELINE_WORK_DATA.frame[k].player[assistId[l]].assist++;
 						}
 						break;
@@ -759,7 +760,7 @@ class TimeLine {
 						if(isEnd)
 							break;
 						
-						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+						killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 
 						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].monsterType)
 						{
@@ -767,7 +768,7 @@ class TimeLine {
 								if(killerId != 0)
 									set_work_frame.player[killerId].dragonKill++;
 								
-								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								{
 									if(killerId != 0)
 										this.TIMELINE_WORK_DATA.frame[k].player[killerId].dragonKill++;
@@ -777,7 +778,7 @@ class TimeLine {
 								if(killerId != 0)
 									set_work_frame.player[killerId].riftheraldKill++;
 								
-								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								{
 									if(killerId != 0)
 										this.TIMELINE_WORK_DATA.frame[k].player[killerId].riftheraldKill++;
@@ -787,7 +788,7 @@ class TimeLine {
 								if(killerId != 0)
 									set_work_frame.player[killerId].baronKill++;
 								
-								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								{
 									if(killerId != 0)
 										this.TIMELINE_WORK_DATA.frame[k].player[killerId].baronKill++;
@@ -802,7 +803,7 @@ class TimeLine {
 						if(isEnd)
 							break;
 						
-						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+						killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
 
 						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].towerType)
 						{
@@ -813,7 +814,7 @@ class TimeLine {
 								if(killerId != 0)
 									set_work_frame.player[killerId].turretsKill++;
 								
-								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								{
 									if(killerId != 0)
 										this.TIMELINE_WORK_DATA.frame[k].player[killerId].turretsKill++;
@@ -823,7 +824,7 @@ class TimeLine {
 								if(killerId != 0)
 									set_work_frame.player[killerId].inhibitorKill++;
 								
-								for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+								for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								{
 									if(killerId != 0)
 										this.TIMELINE_WORK_DATA.frame[k].player[killerId].inhibitorKill++;
@@ -835,30 +836,30 @@ class TimeLine {
 						}
 						break;
 					case "WARD_PLACED" :
-						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].creatorId;
-						var isPlace = false;
+						setId = this.JSON_DATA_TIMELINE.frames[i].events[j].creatorId;
+						let isPlace = false;
 
 						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].wardType)
 						{
 							case "SIGHT_WARD" :
 								set_work_frame.player[setId].wardPlaceWard++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 									this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlaceWard++;
 								isPlace = true;
 								break;
 							case "VISION_WARD" :
 								set_work_frame.player[setId].wardPlaceVision++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 									this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlaceVision++;
 								isPlace = true;
 								break;
 							case "YELLOW_TRINKET" :
 							case "BLUE_TRINKET" :
 								set_work_frame.player[setId].wardPlaceTrinket++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 								{
-//									console.log("k: " + k);
-//									console.log("setID: " + setId);
+									//console.log("k: " + k);
+									//console.log("setID: " + setId);
 									this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlaceTrinket++;
 								}
 								isPlace = true;
@@ -871,32 +872,32 @@ class TimeLine {
 						if(isPlace & !isEnd)
 						{
 							set_work_frame.player[setId].wardPlace++;
-							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								this.TIMELINE_WORK_DATA.frame[k].player[setId].wardPlace++;
 						}
 						break;
 					case "WARD_KILL":
-						var killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
-						var isKill = false;
+						killerId = this.JSON_DATA_TIMELINE.frames[i].events[j].killerId;
+						let isKill = false;
 						
 						switch(this.JSON_DATA_TIMELINE.frames[i].events[j].wardType)
 						{
 							case "SIGHT_WARD" :
 								set_work_frame.player[killerId].wardKillWard++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 									this.TIMELINE_WORK_DATA.frame[k].player[killerId].wardKillWard++;
 								isKill = true;
 								break;
 							case "VISION_WARD" :
 								set_work_frame.player[killerId].wardKillVision++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 									this.TIMELINE_WORK_DATA.frame[k].player[killerId].wardKillVision++;
 								isKill = true;
 								break;
 							case "YELLOW_TRINKET" :
 							case "BLUE_TRINKET" :
 								set_work_frame.player[killerId].wardKillTrinket++;
-								for( var k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
+								for( let k = i+2 ; k < this.TIMELINE_WORK_DATA.frame.length ; ++k )
 									this.TIMELINE_WORK_DATA.frame[k].player[killerId].wardKillTrinket++;
 								isKill = true;
 								break;
@@ -904,7 +905,7 @@ class TimeLine {
 						if(isKill & !isEnd)
 						{
 							set_work_frame.player[killerId].wardKill++;
-							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								this.TIMELINE_WORK_DATA.frame[k].player[killerId].wardKill++;
 						}
 						break;
@@ -912,35 +913,35 @@ class TimeLine {
 						if(isEnd)
 							break;
 						
-						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+						setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
 
 						if( $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].itemId, this.VISION_WARD_ID ) >= 0 )
 						{
 							set_work_frame.player[setId].buyVisionWard++;
-							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard++;
 						}
 						break;
 					case "ITEM_SOLD":
-						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+						setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
 
 						if( $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].itemId, this.VISION_WARD_ID ) >= 0 )
 						{
 							set_work_frame.player[setId].buyVisionWard--;
-							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard--;
 						}
 						break;
 					case "ITEM_UNDO":
-						var setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
-						var isAddd = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].afterId, this.VISION_WARD_ID ) >= 0;
-						var isRem = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].beforeId, this.VISION_WARD_ID ) >= 0;
+						setId = this.JSON_DATA_TIMELINE.frames[i].events[j].participantId;
+						const isAddd = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].afterId, this.VISION_WARD_ID ) >= 0;
+						const isRem = $.inArray( this.JSON_DATA_TIMELINE.frames[i].events[j].beforeId, this.VISION_WARD_ID ) >= 0;
 
 						if( isAddd ^ isRem )
 						{
 							isAddd ? set_work_frame.player[setId].buyVisionWard++ : set_work_frame.player[setId].buyVisionWard--;
 
-							for( var k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
+							for( let k = i+2 ; k < (this.TIMELINE_WORK_DATA.frame.length - 1) ; ++k )
 								isAddd ? this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard++ : this.TIMELINE_WORK_DATA.frame[k].player[setId].buyVisionWard--;
 						}
 						break;
@@ -951,14 +952,14 @@ class TimeLine {
 			}
 		}
 		
-		for( var i = 0 ; i < this.TIMELINE_WORK_DATA.frame.length-1 ; ++i )
+		for( let i = 0 ; i < this.TIMELINE_WORK_DATA.frame.length-1 ; ++i )
 		{
-			for( var j in this.TIMELINE_WORK_DATA.frame[i].player )
+			for( let j in this.TIMELINE_WORK_DATA.frame[i].player )
 			{
 
-				for( var k = 0 ; k < this.JSON_DATA_MATCHDETAIL.teams.length ; ++k )
+				for( let k = 0 ; k < this.JSON_DATA_MATCHDETAIL.teams.length ; ++k )
 				{
-					for( var l = 0 ; l < this.JSON_DATA_MATCHDETAIL.teams[k].player.length ; ++l )
+					for( let l = 0 ; l < this.JSON_DATA_MATCHDETAIL.teams[k].player.length ; ++l )
 					{
 						if( this.TIMELINE_WORK_DATA.frame[i].player[j].participantId == this.JSON_DATA_MATCHDETAIL.teams[k].player[l].participantId )
 						{
@@ -986,14 +987,14 @@ class TimeLine {
 	
 	GetVersion(ver, json)
 	{
-		var version = ver;
+		let version = ver;
 
 		if(version == undefined)
 			return json[0];
 
 		while(1)
 		{
-			for(var i = 0 ; i < json.length ; ++i)
+			for(let i = 0 ; i < json.length ; ++i)
 			{
 				if(version.indexOf(json[i]) !== -1)
 					return json[i];
@@ -1008,7 +1009,7 @@ class TimeLine {
 
 	GetChampionImgName(id)
 	{
-		for( var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i )
+		for( let i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i )
 		{
 			if ( id == this.JSON_DATA_CHAMP_IMG[i].id )
 				return this.JSON_DATA_CHAMP_IMG[i].image.full;
@@ -1017,7 +1018,7 @@ class TimeLine {
 
 	GetChampionName(id)
 	{
-		for( var i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i )
+		for( let i = 0 ; i < this.JSON_DATA_CHAMP_IMG.length ; ++i )
 		{
 			if ( id == this.JSON_DATA_CHAMP_IMG[i].id )
 				return this.JSON_DATA_CHAMP_IMG[i].name;
@@ -1028,13 +1029,13 @@ class TimeLine {
 
 	Show()
 	{
-		var frame = this.TIMELINE_WORK_DATA.frame.length;
+		let frame = this.TIMELINE_WORK_DATA.frame.length;
 		frame = this.TIMELINE_WORK_DATA.frame.length-1;
 
 		this.ShowWinLose();
 		this.ShowTeamName();
 
-		for( var i = 1 ; i <= 5 ; ++i )
+		for( let i = 1 ; i <= 5 ; ++i )
 		{
 			this.ShowChampionImg(i);
 			this.ShowName(i);
@@ -1047,13 +1048,13 @@ class TimeLine {
 
 	ShowChampionImg(player_index)
 	{
-		var champ_index;
-		var champ_img;
-		var champ_name;
+		let champ_index;
+		let champ_img;
+		let champ_name;
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 		{
-			for( var j = 0 ; j < this.JSON_DATA_CHAMP_IMG.length ; ++j )
+			for( let j = 0 ; j < this.JSON_DATA_CHAMP_IMG.length ; ++j )
 			{
 				if(this.JSON_DATA_CHAMP_IMG[j].key == this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].championId)
 				{
@@ -1065,31 +1066,31 @@ class TimeLine {
 			champ_img = this.JSON_DATA_CHAMP_IMG[champ_index].image.full;
 			champ_name = this.JSON_DATA_CHAMP_IMG[champ_index].name;
 
-			var tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
+			const tag = "<img src='" + this.CDN_URL + "/" + this.VERSION + "/img/champion/" + champ_img + "' title='" + champ_name +"' class='champion_img'>";
 			$("#player > player"+ player_index +" > champion_img > " + this.TEAM_TAG[i]).html(tag);
 		}
 	}
 	
 	ShowName(player_index)
 	{
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Name > " + this.TEAM_TAG[i]).html(this.JSON_DATA_MATCHDETAIL.teams[i].player[player_index-1].name);
 	}
 
 	ShowCS(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].cs,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].cs
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > CS > " + this.TEAM_TAG[i]).html("CS : " + num[i]);
 	}
 
 	ShowCSBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].cs,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].cs
 		];
@@ -1099,18 +1100,18 @@ class TimeLine {
 
 	ShowLv(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].lv,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].lv
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("Lv : " + num[i]);
 	}
 
 	ShowLvBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].lv,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].lv
 		];
@@ -1120,18 +1121,18 @@ class TimeLine {
 
 	ShowXp(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].xp,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].xp
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "Xp : " + num[i] : "");
 	}
 
 	ShowXpBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].xp,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].xp
 		];
@@ -1141,18 +1142,18 @@ class TimeLine {
 
 	ShowKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].kill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].kill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
 	}
 
 	ShowKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].kill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].kill
 		];
@@ -1162,18 +1163,18 @@ class TimeLine {
 
 	ShowDeath(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].death,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].death
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
 	}
 
 	ShowDeathBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].death,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].death
 		];
@@ -1183,18 +1184,18 @@ class TimeLine {
 
 	ShowAssist(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assist,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assist
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
 	}
 
 	ShowAssistBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].assist,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].assist
 		];
@@ -1204,18 +1205,18 @@ class TimeLine {
 
 	ShowMinionCS(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].minionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].minionKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > MinionCS > " + this.TEAM_TAG[i]).html("MinionCS : " + num[i]);
 	}
 
 	ShowMinionCSBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].minionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].minionKill
 		];
@@ -1225,18 +1226,18 @@ class TimeLine {
 
 	ShowJungleMinionCS(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].jungleMinionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].jungleMinionKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > JungleCS > " + this.TEAM_TAG[i]).html("JungleCS : " + num[i]);
 	}
 
 	ShowJungleMinionCSBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].jungleMinionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].jungleMinionKill
 		];
@@ -1246,18 +1247,18 @@ class TimeLine {
 
 	ShowGold(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].gold,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].gold
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
 	}
 
 	ShowGoldBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].gold,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].gold
 		];
@@ -1267,18 +1268,18 @@ class TimeLine {
 	
 	ShowPhysicalDamageDealtToChampion(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtToChampions
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > PhysicalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Champion : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageDealtToChampionBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtToChampions
 		];
@@ -1288,18 +1289,18 @@ class TimeLine {
 
 	ShowPhysicalDamageDealtToPlayer(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtPlayer
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > PhysicalDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Player : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageDealtPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageDealtPlayer
 		];
@@ -1309,18 +1310,18 @@ class TimeLine {
 
 	ShowMagicDamageDealtToChampion(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtToChampions
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > MagicDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Champion : " + num[i] : "");
 	}
 
 	ShowMagicDamageDealtToChampionBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtToChampions
 		];
@@ -1330,18 +1331,18 @@ class TimeLine {
 
 	ShowMagicDamageDealtToPlayer(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtPlayer
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > MagicDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Player : " + num[i] : "");
 	}
 
 	ShowMagicDamageDealtToPlayerBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageDealtPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageDealtPlayer
 		];
@@ -1351,18 +1352,18 @@ class TimeLine {
 
 	ShowTrueDamageDealtToChampion(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToChampions
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TrueDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Champion : " + num[i] : "");
 	}
 
 	ShowTrueDamageDealtToChampionBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToChampions
 		];
@@ -1372,18 +1373,18 @@ class TimeLine {
 
 	ShowTrueDamageDealtToPlayer(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToPlayer
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TrueDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Player : " + num[i] : "");
 	}
 
 	ShowTrueDamageDealtToPlayerBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageDealtToPlayer,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageDealtToPlayer
 		];
@@ -1393,18 +1394,18 @@ class TimeLine {
 	
 	ShowTotalDamageDealt(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealt,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealt
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamageDealt : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealt,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealt
 		];
@@ -1413,18 +1414,18 @@ class TimeLine {
 	}
 	ShowTotalDamageDealtToBuilding(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToBuildings,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToBuildings
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalDamageDealtToBuilding > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Building : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtToBuildingBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToBuildings,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToBuildings
 		];
@@ -1434,18 +1435,18 @@ class TimeLine {
 	
 	ShowTotalDamageDealtToChampion(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToChampions
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Champion : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtToChampionBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageDealtToChampions,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageDealtToChampions
 		];
@@ -1455,18 +1456,18 @@ class TimeLine {
 
 	ShowTotalCrawdControlDamageDealt(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalTimeCrowdControlDealt,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalTimeCrowdControlDealt
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalCrawdControlDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "Total TimeCrowd Control <br>Dealt : " + num[i] : "");
 	}
 
 	ShowTotalCrawdControlDamageDealtBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalTimeCrowdControlDealt,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalTimeCrowdControlDealt
 		];
@@ -1476,18 +1477,18 @@ class TimeLine {
 	
 	ShowTotalDamageTaken(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageTaken
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Taken : " + num[i] : "");
 	}
 
 	ShowTotalDamageTakenBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalDamageTaken
 		];
@@ -1497,18 +1498,18 @@ class TimeLine {
 	
 	ShowPhysicalDamageTaken(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageTaken
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > PhysicalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Taken : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageTakenBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].physicalDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].physicalDamageTaken
 		];
@@ -1518,18 +1519,18 @@ class TimeLine {
 	
 	ShowMagicDamageTaken(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageTaken
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > MagicDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Taken : " + num[i] : "");
 	}
 
 	ShowMagicDamageTakenBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].magicDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].magicDamageTaken
 		];
@@ -1539,18 +1540,18 @@ class TimeLine {
 	
 	ShowTrueDamageTaken(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageTaken
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TrueDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Champion : " + num[i] : "");
 	}
 
 	ShowTrueDamageTakenBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].trueDamageTaken,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].trueDamageTaken
 		];
@@ -1560,18 +1561,18 @@ class TimeLine {
 	
 	ShowTotalHeal(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalHeal,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalHeal
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalHeal > " + this.TEAM_TAG[i]).html(isVisible ? "Total Heal <br>to Champion : " + num[i] : "");
 	}
 
 	ShowTotalHealBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalHeal,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalHeal
 		];
@@ -1581,18 +1582,18 @@ class TimeLine {
 	
 	ShowTotalHealToUnit(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalUnitsHealed,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalUnitsHealed
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TotalHealToUnit > " + this.TEAM_TAG[i]).html(isVisible ? "Total Unit Heal : " + num[i] : "");
 	}
 
 	ShowTotalHealToUnitBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].totalUnitsHealed,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].totalUnitsHealed
 		];
@@ -1602,18 +1603,18 @@ class TimeLine {
 
 	ShowTowerKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].turretsKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html("Tower Kill : " + num[i]);
 	}
 
 	ShowTowerKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].turretsKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].turretsKill
 		];
@@ -1623,18 +1624,18 @@ class TimeLine {
 
 	ShowBuyVisionWard(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].buyVisionWard
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
 	}
 
 	ShowBuyVisionWardBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].buyVisionWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].buyVisionWard
 		];
@@ -1644,18 +1645,18 @@ class TimeLine {
 
 	ShowWardPlace(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlace,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlace
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardPlace > " + this.TEAM_TAG[i]).html("Total Ward Place : " + num[i]);
 	}
 
 	ShowWardPlaceBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlace,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlace
 		];
@@ -1665,18 +1666,18 @@ class TimeLine {
 
 	ShowWardKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardKill > " + this.TEAM_TAG[i]).html("Total Ward Destroyed : " + num[i]);
 	}
 
 	ShowWardKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKill
 		];
@@ -1686,18 +1687,18 @@ class TimeLine {
 
 	ShowDragonKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].dragonKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].dragonKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > DragonKill > " + this.TEAM_TAG[i]).html("Dragon Kill : " + num[i]);
 	}
 
 	ShowDragonKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].dragonKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].dragonKill
 		];
@@ -1707,18 +1708,18 @@ class TimeLine {
 
 	ShowRiftheraldKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].riftheraldKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].riftheraldKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > RiftheraldKill > " + this.TEAM_TAG[i]).html("Riftherald Kill : " + num[i]);
 	}
 
 	ShowRiftheraldKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].riftheraldKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].riftheraldKill
 		];
@@ -1728,18 +1729,18 @@ class TimeLine {
 
 	ShowBaronKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].baronKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].baronKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > BaronKill > " + this.TEAM_TAG[i]).html("Baron Kill : " + num[i]);
 	}
 
 	ShowBaronKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].baronKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].baronKill
 		];
@@ -1749,18 +1750,18 @@ class TimeLine {
 
 	ShowInhibitorKill(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].inhibitorKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].inhibitorKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > InhibitorKill > " + this.TEAM_TAG[i]).html("Inhibitor Kill : " + num[i]);
 	}
 
 	ShowInhibitorKillBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].inhibitorKill,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].inhibitorKill
 		];
@@ -1770,18 +1771,18 @@ class TimeLine {
 
 	ShowWardPlaceWard(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceWard
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardPlaceWard > " + this.TEAM_TAG[i]).html( "Ward Place : " + num[i]);
 	}
 
 	ShowWardPlaceWardBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceWard
 		];
@@ -1791,18 +1792,18 @@ class TimeLine {
 
 	ShowWardPlaceVision(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceVision,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceVision
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardPlaceVision > " + this.TEAM_TAG[i]).html( "Vision Ward Place : " + num[i]);
 	}
 
 	ShowWardPlaceVisionBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceVision,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceVision
 		];
@@ -1812,18 +1813,18 @@ class TimeLine {
 	
 	ShowWardPlaceTrinket(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceTrinket,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceTrinket
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardPlaceTrinket > " + this.TEAM_TAG[i]).html( "Trinket Place : " + num[i]);
 	}
 
 	ShowWardPlaceTrinketBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardPlaceTrinket,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardPlaceTrinket
 		];
@@ -1833,18 +1834,18 @@ class TimeLine {
 
 	ShowWardKillWard(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillWard
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardKillWard > " + this.TEAM_TAG[i]).html("Ward Destroyed : " + num[i]);
 	}
 
 	ShowWardKillWardBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillWard,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillWard
 		];
@@ -1854,18 +1855,18 @@ class TimeLine {
 	
 	ShowWardKillVision(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillVision,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillVision
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardKillVision > " + this.TEAM_TAG[i]).html("Vision Ward Destroyed : " + num[i]);
 	}
 
 	ShowWardKillVisionBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillVision,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillVision
 		];
@@ -1875,18 +1876,18 @@ class TimeLine {
 	
 	ShowWardKillTrinket(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillTrinket,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillTrinket
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > WardKillTrinket > " + this.TEAM_TAG[i]).html("Trinket Destroyed : " + num[i]);
 	}
 
 	ShowWardKillTrinketBar(player_index, frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].wardKillTrinket,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].wardKillTrinket
 		];
@@ -1896,7 +1897,7 @@ class TimeLine {
 	
 	ShowJungleCSEnemy(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
 		];
@@ -1904,13 +1905,13 @@ class TimeLine {
 		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle) )
 			isVisible = false;
 		
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
 	}
 
 	ShowJungleCSEnemyBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledEnemyJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledEnemyJungle
 		];
@@ -1923,7 +1924,7 @@ class TimeLine {
 	
 	ShowJungleCSTeam(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
 		];
@@ -1931,13 +1932,13 @@ class TimeLine {
 		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle) )
 			isVisible = false;
 		
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#player > player"+ player_index + " > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
 	}
 
 	ShowJungleCSTeamBar(player_index, frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index].neutralMinionsKilledTeamJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].player[player_index+5].neutralMinionsKilledTeamJungle
 		];
@@ -1952,8 +1953,8 @@ class TimeLine {
 
 	ShowBar(target, num_array, isVisible = true)
 	{
-		var num_blue = num_array[0];
-		var num_red = num_array[1];
+		let num_blue = num_array[0];
+		let num_red = num_array[1];
 		
 		if(num_blue == 0 && num_red == 0)
 		{
@@ -1961,9 +1962,9 @@ class TimeLine {
 			num_red = 1;
 		}
 
-		var per = num_blue / ( num_blue + num_red );
+		const per = num_blue / ( num_blue + num_red );
 
-		var ctx = target.getContext('2d');
+		let ctx = target.getContext('2d');
 
 		if( isVisible )
 		{
@@ -1978,20 +1979,20 @@ class TimeLine {
 
 			ctx.beginPath();
 			ctx.fillStyle = 'rgb(20, 20, 180)'; // blue
-			var blue_width = target.width * per;
+			const blue_width = target.width * per;
 			ctx.fillRect(0, 0, blue_width, target.height);
 
 			ctx.beginPath();
 			ctx.fillStyle = 'rgb(180, 20, 20)'; // red
-			var red_width = target.width - blue_width;
+			const red_width = target.width - blue_width;
 			ctx.fillRect(blue_width, 0, red_width, target.height);
 
-			var blue_par = this.FloatFormat(per * 100, 1);
-			var text_b = blue_par + "%";
-			var red_par = this.FloatFormat(100 - blue_par, 1);
-			var text_r = red_par + "%";
-			var blue_x = Math.floor(blue_width/2);
-			var red_x = Math.floor(blue_width + (red_width/2));
+			const blue_par = this.FloatFormat(per * 100, 1);
+			const text_b = blue_par + "%";
+			const red_par = this.FloatFormat(100 - blue_par, 1);
+			const text_r = red_par + "%";
+			const blue_x = Math.floor(blue_width/2);
+			const red_x = Math.floor(blue_width + (red_width/2));
 
 			ctx.beginPath();
 			ctx.fillStyle = 'rgb(0, 0, 0)';
@@ -2026,40 +2027,40 @@ class TimeLine {
 
 	ShowWinLose()
 	{
-		var num = [];
+		let num = [];
 
 		num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].win ? "Win" : "Lose";
 		num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].win ? "Win" : "Lose";
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > WinLose > " + this.TEAM_TAG[i]).html(num[i]);
 	}
 
 	ShowTeamName()
 	{
-		var num = [
+		const num = [
 			this.JSON_DATA_MATCHDETAIL.teams[0].team_name,
 			this.JSON_DATA_MATCHDETAIL.teams[1].team_name,
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > Name > " + this.TEAM_TAG[i]).html(num[i] + ((i == this.TEAM_TAG.length -1) ? "<br>" : ""));
 	}
 
 	ShowTeamKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].kill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].kill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
 	}
 
 	ShowTeamKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].kill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].kill
 		];
@@ -2069,18 +2070,18 @@ class TimeLine {
 
 	ShowTeamDeath(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].death,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].death
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
 	}
 
 	ShowTeamDeathBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].death,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].death
 		];
@@ -2090,18 +2091,18 @@ class TimeLine {
 
 	ShowTeamAssist(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].assist,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].assist
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
 	}
 
 	ShowTeamAssistBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].assist,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].assist
 		];
@@ -2111,18 +2112,18 @@ class TimeLine {
 
 	ShowTeamGold(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].gold,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].gold
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
 	}
 
 	ShowTeamGoldBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].gold,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].gold
 		];
@@ -2132,18 +2133,18 @@ class TimeLine {
 
 	ShowTeamCS(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].cs,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].cs
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > CS > " + this.TEAM_TAG[i]).html("CS : " + num[i]);
 	}
 
 	ShowTeamCSBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].cs,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].cs
 		];
@@ -2153,18 +2154,18 @@ class TimeLine {
 
 	ShowTeamDragonKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].dragonKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].dragonKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > DragonKill > " + this.TEAM_TAG[i]).html("DragonKill : " + num[i]);
 	}
 
 	ShowTeamDragonKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].dragonKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].dragonKill
 		];
@@ -2174,18 +2175,18 @@ class TimeLine {
 
 	ShowTeamRiftHeraldKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].riftheraldKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].riftheraldKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > RiftHeraldKill > " + this.TEAM_TAG[i]).html("RiftHeraldKill : " + num[i]);
 	}
 
 	ShowTeamRiftHeraldKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].riftheraldKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].riftheraldKill
 		];
@@ -2195,18 +2196,18 @@ class TimeLine {
 
 	ShowTeamBaronKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].baronKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].baronKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > BaronKill > " + this.TEAM_TAG[i]).html("BaronKill : " + num[i]);
 	}
 
 	ShowTeamBaronKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].baronKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].baronKill
 		];
@@ -2216,18 +2217,18 @@ class TimeLine {
 
 	ShowTeamTowerKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].turretsKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].turretsKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > TowerKill > " + this.TEAM_TAG[i]).html("TowerKill : " + num[i]);
 	}
 
 	ShowTeamTowerKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].turretsKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].turretsKill
 		];
@@ -2237,18 +2238,18 @@ class TimeLine {
 	
 	ShowTeamInhibitorKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].inhibitorKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].inhibitorKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > InhibitorKill > " + this.TEAM_TAG[i]).html("InhibitorKill : " + num[i]);
 	}
 
 	ShowTeamInhibitorKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].inhibitorKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].inhibitorKill
 		];
@@ -2258,18 +2259,18 @@ class TimeLine {
 	
 	ShowTeamWardPlace(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].wardPlace,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].wardPlace
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > WardPlace > " + this.TEAM_TAG[i]).html("Total Ward Place : " + num[i]);
 	}
 
 	ShowTeamWardPlaceBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].wardPlace,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].wardPlace
 		];
@@ -2279,18 +2280,18 @@ class TimeLine {
 	
 	ShowTeamWardKill(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].wardKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].wardKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > WardKill > " + this.TEAM_TAG[i]).html("Ward Kill : " + num[i]);
 	}
 
 	ShowTeamWardKillBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].wardKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].wardKill
 		];
@@ -2300,18 +2301,18 @@ class TimeLine {
 	
 	ShowTeamBuyVisionWard(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].buyVisionWard,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].buyVisionWard
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
 	}
 	
 	ShowTeamBuyVisionWardBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].buyVisionWard,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].buyVisionWard
 		];
@@ -2321,18 +2322,18 @@ class TimeLine {
 
 	ShowTeamJungleCS(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].jungleMinionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].jungleMinionKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > JungleCS > " + this.TEAM_TAG[i]).html( "JungleCS : " + num[i]);
 	}
 	
 	ShowTeamJungleCSBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].jungleMinionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].jungleMinionKill
 		];
@@ -2342,18 +2343,18 @@ class TimeLine {
 
 	ShowTeamMinionCS(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].minionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].minionKill
 		];
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > MinionCS > " + this.TEAM_TAG[i]).html("MinionCS : " + num[i]);
 	}
 	
 	ShowTeamMinionCSBar(frame)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].minionKill,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].minionKill
 		];
@@ -2363,7 +2364,7 @@ class TimeLine {
 
 	ShowTeamJungleCSEnemy(frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
 		];
@@ -2371,13 +2372,13 @@ class TimeLine {
 		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle) )
 			isVisible = false;
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
 	}
 	
 	ShowTeamJungleCSEnemyBar(frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledEnemyJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledEnemyJungle
 		];
@@ -2390,7 +2391,7 @@ class TimeLine {
 
 	ShowTeamJungleCSTeam(frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle
 		];
@@ -2398,13 +2399,13 @@ class TimeLine {
 		if( isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle) || isNaN(this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle) )
 			isVisible = false;
 
-		for( var i = 0 ; i < this.TEAM_TAG.length ; ++i )
+		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
 	}
 	
 	ShowTeamJungleCSTeamBar(frame, isVisible)
 	{
-		var num = [
+		const num = [
 			this.TIMELINE_WORK_DATA.frame[frame].team[0].neutralMinionsKilledTeamJungle,
 			this.TIMELINE_WORK_DATA.frame[frame].team[1].neutralMinionsKilledTeamJungle
 		];
@@ -2419,7 +2420,7 @@ class TimeLine {
 
 	FloatFormat( number, n )
 	{
-		var _pow = Math.pow( 10 , n ) ;
+		const _pow = Math.pow( 10 , n ) ;
 
 		return Math.round( number * _pow ) / _pow;
 	}
@@ -2428,15 +2429,15 @@ class TimeLine {
 
 	ChangeFrame(handle)
 	{
-		var self = handle.data;
+		let self = handle.data;
 		self.frame = $("#frame_slidebar").val();
-		var frame = self.frame;
+		const frame = self.frame;
 		self.isEndFrame = false;
 
 		if( frame >= self.JSON_DATA_TIMELINE.frames.length )
 			self.isEndFrame = true;
 		
-		var isEnd = self.isEndFrame;
+		const isEnd = self.isEndFrame;
 
 		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
 
@@ -2464,7 +2465,7 @@ class TimeLine {
 		this.ShowTeamJungleCSEnemy(frame, isEnd);
 		this.ShowTeamJungleCSTeam(frame, isEnd);
 
-		for(var player_index = 1 ; player_index <= 5 ; ++player_index )
+		for(let player_index = 1 ; player_index <= 5 ; ++player_index )
 		{
 			this.ShowLv(player_index, frame);
 			this.ShowXp(player_index, frame, !isEnd);
@@ -2530,7 +2531,7 @@ class TimeLine {
 		this.ShowTeamJungleCSEnemyBar(frame, isEnd);
 		this.ShowTeamJungleCSTeamBar(frame, isEnd);
 
-		for(var player_index = 1 ; player_index <= 5 ; ++player_index )
+		for(let player_index = 1 ; player_index <= 5 ; ++player_index )
 		{
 			this.ShowLvBar(player_index, frame);
 			this.ShowXpBar(player_index, frame, !isEnd);
@@ -2583,8 +2584,8 @@ class TimeLine {
 		if(!this.isShow)
 			return;
 
-		var isEnd = this.isEndFrame;
-		var frame = this.frame;	
+		const isEnd = this.isEndFrame;
+		const frame = this.frame;	
 
 		this.ChangeBar(frame,isEnd);
 	}
@@ -2593,7 +2594,7 @@ class TimeLine {
 
 	CheckLiveServer(region)
 	{
-		for( var i = 0 ; i < this.REGION_CODE.length ; ++i )
+		for( let i = 0 ; i < this.REGION_CODE.length ; ++i )
 		{
 			if( region.toUpperCase() == this.REGION_CODE[i] )
 			{
@@ -2604,11 +2605,11 @@ class TimeLine {
 	}
 }
 
-var timeline = new TimeLine();
+let timeline = new TimeLine();
 timeline.Init(location.href);
 
-var resizeTimer;
-var interval = Math.floor(1000 / 60 * 10);
+let resizeTimer;
+const interval = Math.floor(1000 / 60 * 10);
 
 $(window).on('resize', function()
 {
