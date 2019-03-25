@@ -160,7 +160,7 @@ class TimeLine {
 				// レーン情報が可笑しいjsonデータの場合は空いてるレーンに突っ込む
 				for( let i = 0 ; i < work.length ; ++i )
 				{
-					for( let j = 0 ; j < work[i].length ; ++j )
+					for( let j = 0 ; j < matchDetailData.teams[i].player.length ; ++j )
 					{
 						if(!work[i][j])
 						{
@@ -192,7 +192,7 @@ class TimeLine {
 
 				for( let i = 0 ; i < work.length ; ++i )
 				{
-					matchDetailData.teams[i].player = work[i];
+					matchDetailData.teams[i].player = work[i].concat();
 				}
 			}
 			
