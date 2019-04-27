@@ -34,7 +34,7 @@ class TimeLine {
 		this.isEndFrame = false;
 
 		this.REGION_CODE = [ "BR1", "EUN1", "EUW1", "JP1", "KR", "LA1", "LA2", "NA1", "OC1", "TR1", "RU", "PBE1" ];
-		this.TEAM_NAME = [ "Blue", "Red" ];
+		this.TEAM_NAME = [ "ブルー", "レッド" ];
 		this.isLiveSever = false;
 	}
 
@@ -1106,7 +1106,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("Lv : " + num[i]);
+			$("#player > player"+ player_index + " > Lv > " + this.TEAM_TAG[i]).html("レベル : " + num[i]);
 	}
 
 	ShowLvBar(player_index, frame)
@@ -1127,7 +1127,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "Xp : " + num[i] : "");
+			$("#player > player"+ player_index + " > Xp > " + this.TEAM_TAG[i]).html(isVisible ? "経験値 : " + num[i] : "");
 	}
 
 	ShowXpBar(player_index, frame, isVisible)
@@ -1148,7 +1148,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
+			$("#player > player"+ player_index + " > Kill > " + this.TEAM_TAG[i]).html("キル : " + num[i]);
 	}
 
 	ShowKillBar(player_index, frame)
@@ -1169,7 +1169,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
+			$("#player > player"+ player_index + " > Death > " + this.TEAM_TAG[i]).html("デス : " + num[i]);
 	}
 
 	ShowDeathBar(player_index, frame)
@@ -1190,7 +1190,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
+			$("#player > player"+ player_index + " > Assist > " + this.TEAM_TAG[i]).html("アシスト : " + num[i]);
 	}
 
 	ShowAssistBar(player_index, frame)
@@ -1211,7 +1211,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > MinionCS > " + this.TEAM_TAG[i]).html("MinionCS : " + num[i]);
+			$("#player > player"+ player_index + " > MinionCS > " + this.TEAM_TAG[i]).html("ミニオンCS : " + num[i]);
 	}
 
 	ShowMinionCSBar(player_index, frame)
@@ -1232,7 +1232,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > JungleCS > " + this.TEAM_TAG[i]).html("JungleCS : " + num[i]);
+			$("#player > player"+ player_index + " > JungleCS > " + this.TEAM_TAG[i]).html("ジャングルCS : " + num[i]);
 	}
 
 	ShowJungleMinionCSBar(player_index, frame)
@@ -1253,7 +1253,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
+			$("#player > player"+ player_index + " > Gold > " + this.TEAM_TAG[i]).html("ゴールド : " + num[i]);
 	}
 
 	ShowGoldBar(player_index, frame)
@@ -1274,7 +1274,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > PhysicalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > PhysicalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "与物理ダメージ<br>敵チャンピオン : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageDealtToChampionBar(player_index, frame, isVisible)
@@ -1295,7 +1295,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > PhysicalDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Dealt <br>to Player : " + num[i] : "");
+			$("#player > player"+ player_index + " > PhysicalDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "与物理ダメージ<br>プレイヤー : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageDealtToPlayerBar(player_index, frame, isVisible)
@@ -1316,7 +1316,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > MagicDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > MagicDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "与魔法ダメージ<br>敵チャンピオン : " + num[i] : "");
 	}
 
 	ShowMagicDamageDealtToChampionBar(player_index, frame, isVisible)
@@ -1337,7 +1337,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > MagicDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Dealt <br>to Player : " + num[i] : "");
+			$("#player > player"+ player_index + " > MagicDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "与魔法ダメージ<br>プレイヤー : " + num[i] : "");
 	}
 
 	ShowMagicDamageDealtToPlayerBar(player_index, frame, isVisible)
@@ -1358,7 +1358,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TrueDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > TrueDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "確定ダメージ <br>敵チャンピオン : " + num[i] : "");
 	}
 
 	ShowTrueDamageDealtToChampionBar(player_index, frame, isVisible)
@@ -1379,7 +1379,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TrueDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Player : " + num[i] : "");
+			$("#player > player"+ player_index + " > TrueDamageDealtToPlayer > " + this.TEAM_TAG[i]).html(isVisible ? "確定ダメージ<br>プレイヤー : " + num[i] : "");
 	}
 
 	ShowTrueDamageDealtToPlayerBar(player_index, frame, isVisible)
@@ -1400,7 +1400,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamageDealt : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "与ダメージ合計 : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtBar(player_index, frame, isVisible)
@@ -1420,7 +1420,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalDamageDealtToBuilding > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Building : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalDamageDealtToBuilding > " + this.TEAM_TAG[i]).html(isVisible ? "与ダメージ<br>建物 : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtToBuildingBar(player_index, frame, isVisible)
@@ -1441,7 +1441,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Dealt <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalDamageDealtToChampion > " + this.TEAM_TAG[i]).html(isVisible ? "与ダメージ<br>チャンピオン : " + num[i] : "");
 	}
 
 	ShowTotalDamageDealtToChampionBar(player_index, frame, isVisible)
@@ -1462,7 +1462,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalCrawdControlDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "Total TimeCrowd Control <br>Dealt : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalCrawdControlDamageDealt > " + this.TEAM_TAG[i]).html(isVisible ? "クラウドコントロールタイム合計 : " + num[i] : "");
 	}
 
 	ShowTotalCrawdControlDamageDealtBar(player_index, frame, isVisible)
@@ -1483,7 +1483,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "TotalDamage Taken : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "受けたダメージ量 : " + num[i] : "");
 	}
 
 	ShowTotalDamageTakenBar(player_index, frame, isVisible)
@@ -1504,7 +1504,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > PhysicalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "PhysicalDamage Taken : " + num[i] : "");
+			$("#player > player"+ player_index + " > PhysicalDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "被物理ダメージ : " + num[i] : "");
 	}
 
 	ShowPhysicalDamageTakenBar(player_index, frame, isVisible)
@@ -1525,7 +1525,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > MagicDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "MagicDamage Taken : " + num[i] : "");
+			$("#player > player"+ player_index + " > MagicDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "被魔法ダメージ : " + num[i] : "");
 	}
 
 	ShowMagicDamageTakenBar(player_index, frame, isVisible)
@@ -1546,7 +1546,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TrueDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "TrueDamage Dealt <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > TrueDamageTaken > " + this.TEAM_TAG[i]).html(isVisible ? "被確定ダメージ<br>チャンピオン : " + num[i] : "");
 	}
 
 	ShowTrueDamageTakenBar(player_index, frame, isVisible)
@@ -1567,7 +1567,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalHeal > " + this.TEAM_TAG[i]).html(isVisible ? "Total Heal <br>to Champion : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalHeal > " + this.TEAM_TAG[i]).html(isVisible ? "合計ヒール量 : " + num[i] : "");
 	}
 
 	ShowTotalHealBar(player_index, frame, isVisible)
@@ -1588,7 +1588,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TotalHealToUnit > " + this.TEAM_TAG[i]).html(isVisible ? "Total Unit Heal : " + num[i] : "");
+			$("#player > player"+ player_index + " > TotalHealToUnit > " + this.TEAM_TAG[i]).html(isVisible ? "ユニットヒール量 : " + num[i] : "");
 	}
 
 	ShowTotalHealToUnitBar(player_index, frame, isVisible)
@@ -1609,7 +1609,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html("Tower Kill : " + num[i]);
+			$("#player > player"+ player_index + " > TowerKill > " + this.TEAM_TAG[i]).html("タワー破壊数 : " + num[i]);
 	}
 
 	ShowTowerKillBar(player_index, frame)
@@ -1630,7 +1630,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
+			$("#player > player"+ player_index + " > BuyVisionWard > " + this.TEAM_TAG[i]).html("ビジョンワード購入数 : " + num[i]);
 	}
 
 	ShowBuyVisionWardBar(player_index, frame)
@@ -1651,7 +1651,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardPlace > " + this.TEAM_TAG[i]).html("Total Ward Place : " + num[i]);
+			$("#player > player"+ player_index + " > WardPlace > " + this.TEAM_TAG[i]).html("ワードを置いた合計数 : " + num[i]);
 	}
 
 	ShowWardPlaceBar(player_index, frame)
@@ -1672,7 +1672,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardKill > " + this.TEAM_TAG[i]).html("Total Ward Destroyed : " + num[i]);
+			$("#player > player"+ player_index + " > WardKill > " + this.TEAM_TAG[i]).html("ワードを壊した数 : " + num[i]);
 	}
 
 	ShowWardKillBar(player_index, frame)
@@ -1693,7 +1693,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > DragonKill > " + this.TEAM_TAG[i]).html("Dragon Kill : " + num[i]);
+			$("#player > player"+ player_index + " > DragonKill > " + this.TEAM_TAG[i]).html("ドラゴンキル数 : " + num[i]);
 	}
 
 	ShowDragonKillBar(player_index, frame)
@@ -1714,7 +1714,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > RiftheraldKill > " + this.TEAM_TAG[i]).html("Riftherald Kill : " + num[i]);
+			$("#player > player"+ player_index + " > RiftheraldKill > " + this.TEAM_TAG[i]).html("リフトヘラルドキル数 : " + num[i]);
 	}
 
 	ShowRiftheraldKillBar(player_index, frame)
@@ -1735,7 +1735,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > BaronKill > " + this.TEAM_TAG[i]).html("Baron Kill : " + num[i]);
+			$("#player > player"+ player_index + " > BaronKill > " + this.TEAM_TAG[i]).html("バロンキル数 : " + num[i]);
 	}
 
 	ShowBaronKillBar(player_index, frame)
@@ -1756,7 +1756,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > InhibitorKill > " + this.TEAM_TAG[i]).html("Inhibitor Kill : " + num[i]);
+			$("#player > player"+ player_index + " > InhibitorKill > " + this.TEAM_TAG[i]).html("インヒビター破壊数 : " + num[i]);
 	}
 
 	ShowInhibitorKillBar(player_index, frame)
@@ -1777,7 +1777,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardPlaceWard > " + this.TEAM_TAG[i]).html( "Ward Place : " + num[i]);
+			$("#player > player"+ player_index + " > WardPlaceWard > " + this.TEAM_TAG[i]).html( "ワードを置いた数 : " + num[i]);
 	}
 
 	ShowWardPlaceWardBar(player_index, frame)
@@ -1798,7 +1798,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardPlaceVision > " + this.TEAM_TAG[i]).html( "Vision Ward Place : " + num[i]);
+			$("#player > player"+ player_index + " > WardPlaceVision > " + this.TEAM_TAG[i]).html( "ビジョンワードを置いた数 : " + num[i]);
 	}
 
 	ShowWardPlaceVisionBar(player_index, frame)
@@ -1819,7 +1819,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardPlaceTrinket > " + this.TEAM_TAG[i]).html( "Trinket Place : " + num[i]);
+			$("#player > player"+ player_index + " > WardPlaceTrinket > " + this.TEAM_TAG[i]).html( "トリンケットワードを置いた数 : " + num[i]);
 	}
 
 	ShowWardPlaceTrinketBar(player_index, frame)
@@ -1840,7 +1840,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardKillWard > " + this.TEAM_TAG[i]).html("Ward Destroyed : " + num[i]);
+			$("#player > player"+ player_index + " > WardKillWard > " + this.TEAM_TAG[i]).html("ワード破壊数 : " + num[i]);
 	}
 
 	ShowWardKillWardBar(player_index, frame)
@@ -1861,7 +1861,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardKillVision > " + this.TEAM_TAG[i]).html("Vision Ward Destroyed : " + num[i]);
+			$("#player > player"+ player_index + " > WardKillVision > " + this.TEAM_TAG[i]).html("ビジョンワード破壊数 : " + num[i]);
 	}
 
 	ShowWardKillVisionBar(player_index, frame)
@@ -1882,7 +1882,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > WardKillTrinket > " + this.TEAM_TAG[i]).html("Trinket Destroyed : " + num[i]);
+			$("#player > player"+ player_index + " > WardKillTrinket > " + this.TEAM_TAG[i]).html("トリンケットワード破壊数 : " + num[i]);
 	}
 
 	ShowWardKillTrinketBar(player_index, frame)
@@ -1906,7 +1906,7 @@ class TimeLine {
 			isVisible = false;
 		
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
+			$("#player > player"+ player_index + " > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "ジャングルCS<br>敵サイド : " + num[i] : "");
 	}
 
 	ShowJungleCSEnemyBar(player_index, frame, isVisible)
@@ -1933,7 +1933,7 @@ class TimeLine {
 			isVisible = false;
 		
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#player > player"+ player_index + " > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
+			$("#player > player"+ player_index + " > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "ジャングルCS<br>自サイド : " + num[i] : "");
 	}
 
 	ShowJungleCSTeamBar(player_index, frame, isVisible)
@@ -2029,8 +2029,8 @@ class TimeLine {
 	{
 		let num = [];
 
-		num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].win ? "Win" : "Lose";
-		num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].win ? "Win" : "Lose";
+		num[0] = this.JSON_DATA_MATCHDETAIL.teams[0].win ? "勝利" : "敗北";
+		num[1] = this.JSON_DATA_MATCHDETAIL.teams[1].win ? "勝利" : "敗北";
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
 			$("#team > WinLose > " + this.TEAM_TAG[i]).html(num[i]);
@@ -2055,7 +2055,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Kill > " + this.TEAM_TAG[i]).html("Kill : " + num[i]);
+			$("#team > Kill > " + this.TEAM_TAG[i]).html("キル : " + num[i]);
 	}
 
 	ShowTeamKillBar(frame)
@@ -2076,7 +2076,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Death > " + this.TEAM_TAG[i]).html("Death : " + num[i]);
+			$("#team > Death > " + this.TEAM_TAG[i]).html("デス : " + num[i]);
 	}
 
 	ShowTeamDeathBar(frame)
@@ -2097,7 +2097,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Assist > " + this.TEAM_TAG[i]).html("Assist : " + num[i]);
+			$("#team > Assist > " + this.TEAM_TAG[i]).html("アシスト : " + num[i]);
 	}
 
 	ShowTeamAssistBar(frame)
@@ -2118,7 +2118,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > Gold > " + this.TEAM_TAG[i]).html("Gold : " + num[i]);
+			$("#team > Gold > " + this.TEAM_TAG[i]).html("ゴールド : " + num[i]);
 	}
 
 	ShowTeamGoldBar(frame)
@@ -2160,7 +2160,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > DragonKill > " + this.TEAM_TAG[i]).html("DragonKill : " + num[i]);
+			$("#team > DragonKill > " + this.TEAM_TAG[i]).html("ドラゴンキル数 : " + num[i]);
 	}
 
 	ShowTeamDragonKillBar(frame)
@@ -2181,7 +2181,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > RiftHeraldKill > " + this.TEAM_TAG[i]).html("RiftHeraldKill : " + num[i]);
+			$("#team > RiftHeraldKill > " + this.TEAM_TAG[i]).html("リフトヘラルドキル数 : " + num[i]);
 	}
 
 	ShowTeamRiftHeraldKillBar(frame)
@@ -2202,7 +2202,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > BaronKill > " + this.TEAM_TAG[i]).html("BaronKill : " + num[i]);
+			$("#team > BaronKill > " + this.TEAM_TAG[i]).html("バロンキル数 : " + num[i]);
 	}
 
 	ShowTeamBaronKillBar(frame)
@@ -2223,7 +2223,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > TowerKill > " + this.TEAM_TAG[i]).html("TowerKill : " + num[i]);
+			$("#team > TowerKill > " + this.TEAM_TAG[i]).html("タワー破壊数 : " + num[i]);
 	}
 
 	ShowTeamTowerKillBar(frame)
@@ -2244,7 +2244,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > InhibitorKill > " + this.TEAM_TAG[i]).html("InhibitorKill : " + num[i]);
+			$("#team > InhibitorKill > " + this.TEAM_TAG[i]).html("インヒビター破壊数 : " + num[i]);
 	}
 
 	ShowTeamInhibitorKillBar(frame)
@@ -2265,7 +2265,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > WardPlace > " + this.TEAM_TAG[i]).html("Total Ward Place : " + num[i]);
+			$("#team > WardPlace > " + this.TEAM_TAG[i]).html("ワードを置いた数 : " + num[i]);
 	}
 
 	ShowTeamWardPlaceBar(frame)
@@ -2286,7 +2286,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > WardKill > " + this.TEAM_TAG[i]).html("Ward Kill : " + num[i]);
+			$("#team > WardKill > " + this.TEAM_TAG[i]).html("ワードを壊した数 : " + num[i]);
 	}
 
 	ShowTeamWardKillBar(frame)
@@ -2307,7 +2307,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > BuyVisionWard > " + this.TEAM_TAG[i]).html("Purchased VisionWard : " + num[i]);
+			$("#team > BuyVisionWard > " + this.TEAM_TAG[i]).html("購入したビジョンワード数 : " + num[i]);
 	}
 	
 	ShowTeamBuyVisionWardBar(frame)
@@ -2328,7 +2328,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > JungleCS > " + this.TEAM_TAG[i]).html( "JungleCS : " + num[i]);
+			$("#team > JungleCS > " + this.TEAM_TAG[i]).html( "ジャングルCS数 : " + num[i]);
 	}
 	
 	ShowTeamJungleCSBar(frame)
@@ -2349,7 +2349,7 @@ class TimeLine {
 		];
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > MinionCS > " + this.TEAM_TAG[i]).html("MinionCS : " + num[i]);
+			$("#team > MinionCS > " + this.TEAM_TAG[i]).html("ミニオンCS数 : " + num[i]);
 	}
 	
 	ShowTeamMinionCSBar(frame)
@@ -2373,7 +2373,7 @@ class TimeLine {
 			isVisible = false;
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>Enemy Side : " + num[i] : "");
+			$("#team > JungleCSEnemy > " + this.TEAM_TAG[i]).html(isVisible ? "ジャングルCS数 <br>敵サイド : " + num[i] : "");
 	}
 	
 	ShowTeamJungleCSEnemyBar(frame, isVisible)
@@ -2400,7 +2400,7 @@ class TimeLine {
 			isVisible = false;
 
 		for( let i = 0 ; i < this.TEAM_TAG.length ; ++i )
-			$("#team > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "JungleCS <br>My Side : " + num[i] : "");
+			$("#team > JungleCSTeam > " + this.TEAM_TAG[i]).html(isVisible ? "ジャングルCS数 <br>自サイド : " + num[i] : "");
 	}
 	
 	ShowTeamJungleCSTeamBar(frame, isVisible)
@@ -2439,7 +2439,7 @@ class TimeLine {
 		
 		const isEnd = self.isEndFrame;
 
-		document.getElementById("frame").innerHTML = isEnd ? "End Game" : frame + ":00";
+		document.getElementById("frame").innerHTML = isEnd ? "ゲーム終了" : frame + ":00";
 
 		self.ChangeParam(frame, isEnd);
 		self.ChangeBar(frame, isEnd);
